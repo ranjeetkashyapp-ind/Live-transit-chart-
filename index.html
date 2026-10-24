@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live Transit Chart</title>
+<style>
+body{font-family:Arial,sans-serif;background:#fff8ed;color:#392514;text-align:center;margin:0;padding:16px}
+h2{color:#a64b12}
+#clock{font-size:18px;margin:12px}
+svg{width:100%;max-width:420px;height:auto}
+.chart{fill:#fffdf8;stroke:#b65b20;stroke-width:2}
+.line{fill:none;stroke:#b65b20;stroke-width:1.5}
+.cell{font-size:13px;fill:#392514;text-anchor:middle}
+.note{font-size:14px;line-height:1.5}
+</style>
+</head>
+<body>
+<h2>Live Vedic Transit Chart</h2>
+<div id="clock"></div>
+<svg viewBox="0 0 400 400" role="img" aria-label="North Indian diamond chart">
+<rect x="10" y="10" width="380" height="380" class="chart"/>
+<path d="M10 10 L390 390 M390 10 L10 390 M200 10 L390 200 L200 390 L10 200 Z" class="line"/>
+<path d="M200 10 L200 390 M10 200 L390 200" class="line"/>
+<text x="200" y="90" class="cell">1</text>
+<text x="100" y="65" class="cell">2</text>
+<text x="55" y="130" class="cell">3</text>
+<text x="100" y="205" class="cell">4</text>
+<text x="55" y="280" class="cell">5</text>
+<text x="100" y="345" class="cell">6</text>
+<text x="200" y="315" class="cell">7</text>
+<text x="300" y="345" class="cell">8</text>
+<text x="345" y="280" class="cell">9</text>
+<text x="300" y="205" class="cell">10</text>
+<text x="345" y="130" class="cell">11</text>
+<text x="300" y="65" class="cell">12</text>
+<text x="200" y="190" class="cell">Transit</text>
+</svg>
+<p class="note">Chart layout preview only. Planetary positions will be added in the next step.</p>
+<script>
+function updateClock(){
+ document.getElementById('clock').textContent =
+ 'India Time: '+new Intl.DateTimeFormat('en-IN',{
+ timeZone:'Asia/Kolkata',dateStyle:'medium',timeStyle:'medium'
+ }).format(new Date());
+}
+updateClock();
+setInterval(updateClock,1000);
+</script>
+</body>
+</html>
