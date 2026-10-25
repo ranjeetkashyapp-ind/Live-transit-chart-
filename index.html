@@ -31,8 +31,8 @@ footer{text-align:center;margin:22px 0 8px;font-size:14px;color:#9b6b17;font-wei
 <header><div class="logoText">Astro Plus</div><h2>Live- Transit- Chart</h2></header>
 <div id="time">गणना हो रही है…</div>
 <div class="controls">
-  <button id="rotateBtn" type="button">Rotate ↻</button>
-  <button id="rotateBackBtn" type="button">Rotate ↺</button>
+  <button id="rotateBackBtn" type="button">← Rotate Left</button>
+  <button id="rotateBtn" type="button">Rotate Right →</button>
   <label for="rotation">Rotation:</label>
   <select id="rotation" aria-label="Rotation">
     <option value="0">0°</option><option value="1">30°</option><option value="2">60°</option>
@@ -119,9 +119,17 @@ function render(){
   const h=document.createElementNS("http://www.w3.org/2000/svg","text");
   h.setAttribute("x",x);h.setAttribute("y",y);h.setAttribute("class","house");
   h.textContent=String(signNo);g.appendChild(h);
+  // Keep planet labels inside each bhava. Spread labels around the sign number,
+  // using compact spacing when several planets share one bhava.
+  const lineGap = items.length >= 5 ? 11 : (items.length >= 3 ? 13 : 15);
+  const firstY = y + 18;
   items.forEach((p,j)=>{
    const el=document.createElementNS("http://www.w3.org/2000/svg","text");
-   el.setAttribute("x",x);el.setAttribute("y",y+18+j*15);
+   let labelY = firstY + j*lineGap;
+   // Bottom and top cells have less room near the frame; pull labels inward.
+   if (y >= 330) labelY = y - 25 + j*lineGap;
+   if (y <= 65) labelY = y + 17 + j*lineGap;
+   el.setAttribute("x",x);el.setAttribute("y",labelY);
    el.setAttribute("class","planet");el.setAttribute("fill",p.color);
    el.textContent=p.short+" "+String(Math.floor(p.within)).padStart(2,"0")+"°";
    g.appendChild(el);
@@ -148,13 +156,13 @@ function calc(){
   console.error(e);
  }
 }
-document.getElementById("rotateBtn").addEventListener("click",()=>{
- const sel=document.getElementById("rotation");
- sel.value=String((Number(sel.value)+1)%12);render();
-});
 document.getElementById("rotateBackBtn").addEventListener("click",()=>{
  const sel=document.getElementById("rotation");
  sel.value=String((Number(sel.value)+11)%12);render();
+});
+document.getElementById("rotateBtn").addEventListener("click",()=>{
+ const sel=document.getElementById("rotation");
+ sel.value=String((Number(sel.value)+1)%12);render();
 });
 document.getElementById("rotation").addEventListener("change",render);
 calc();setInterval(calc,60000);
