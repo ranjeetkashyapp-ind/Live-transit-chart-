@@ -17,8 +17,8 @@ button,select{font-size:14px;padding:9px 14px;border:1px solid var(--line);borde
 button{background:#c98217;color:white;font-weight:bold;cursor:pointer}
 svg{display:block;width:100%;height:auto;max-width:600px;margin:auto}
 .frame{fill:none;stroke:var(--line);stroke-width:2}
-.house{font-size:13px;fill:#806c5b;text-anchor:middle}
-.planet{font-size:11px;font-weight:bold;text-anchor:middle}
+.house{font-size:16px;font-weight:bold;fill:#806c5b;text-anchor:middle}
+.planet{font-size:13px;font-weight:bold;text-anchor:middle}
 #status{text-align:center;font-size:13px;color:var(--muted);margin:12px 0}
 .tableWrap{max-width:600px;margin:auto}
 table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
@@ -31,7 +31,8 @@ footer{text-align:center;margin:22px 0 8px;font-size:14px;color:#9b6b17;font-wei
 <header><div class="logoText">Astro Plus</div><h2>Live- Transit- Chart</h2></header>
 <div id="time">गणना हो रही है…</div>
 <div class="controls">
-  <button id="rotateBtn" type="button">Rotate</button>
+  <button id="rotateBtn" type="button">Rotate ↻</button>
+  <button id="rotateBackBtn" type="button">Rotate ↺</button>
   <label for="rotation">Rotation:</label>
   <select id="rotation" aria-label="Rotation">
     <option value="0">0°</option><option value="1">30°</option><option value="2">60°</option>
@@ -120,7 +121,7 @@ function render(){
   h.textContent=String(signNo);g.appendChild(h);
   items.forEach((p,j)=>{
    const el=document.createElementNS("http://www.w3.org/2000/svg","text");
-   el.setAttribute("x",x);el.setAttribute("y",y+15+j*13);
+   el.setAttribute("x",x);el.setAttribute("y",y+18+j*15);
    el.setAttribute("class","planet");el.setAttribute("fill",p.color);
    el.textContent=p.short+" "+String(Math.floor(p.within)).padStart(2,"0")+"°";
    g.appendChild(el);
@@ -150,6 +151,10 @@ function calc(){
 document.getElementById("rotateBtn").addEventListener("click",()=>{
  const sel=document.getElementById("rotation");
  sel.value=String((Number(sel.value)+1)%12);render();
+});
+document.getElementById("rotateBackBtn").addEventListener("click",()=>{
+ const sel=document.getElementById("rotation");
+ sel.value=String((Number(sel.value)+11)%12);render();
 });
 document.getElementById("rotation").addEventListener("change",render);
 calc();setInterval(calc,60000);
