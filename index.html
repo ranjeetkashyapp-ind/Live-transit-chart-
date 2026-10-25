@@ -12,8 +12,8 @@ header{text-align:center;margin:0 auto 12px;max-width:600px}
 .logoText{font-weight:700;font-size:22px;margin:4px 0;color:#b58120}
 h2{font-size:19px;text-align:center;margin:5px 0 12px}
 #time{text-align:center;color:var(--muted);font-size:13px;margin:8px 0 14px}
-.dateControls{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;max-width:600px;margin:10px auto 14px;font-size:13px}.dateControls input,.dateControls select{font:inherit;padding:8px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
-#ampm{font-weight:bold;border:2px solid #c98217}#ampm:has(option:checked[value="AM"]){background:#e5f2ff;color:#2878D0;border-color:#2878D0}#ampm:has(option:checked[value="PM"]){background:#ffe5ec;color:#C65383;border-color:#C65383}#ampm option[value="AM"]{background:#e5f2ff;color:#2878D0}#ampm option[value="PM"]{background:#ffe5ec;color:#C65383}
+.timeGroup{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}.dateControls{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;max-width:600px;margin:10px auto 14px;font-size:13px}.dateControls input,.dateControls select{font:inherit;padding:8px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+#ampm{font-weight:bold;border:0;background:transparent;padding:2px 3px;color:#2878D0;min-width:42px}#ampm:has(option:checked[value="PM"]){color:#C65383}#ampm option[value="AM"]{color:#2878D0}#ampm option[value="PM"]{color:#C65383}
 .planet{font-size:10px;font-weight:bold;text-anchor:middle;paint-order:stroke;stroke:#fff;stroke-width:1.4px;stroke-linejoin:round}
 .controls{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin:10px auto 14px}
 button,select{font-size:14px;padding:9px 14px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
@@ -35,7 +35,7 @@ footer{text-align:center;margin:22px 0 8px;font-size:14px;color:#9b6b17;font-wei
 <div id="time">गणना हो रही है…</div>
 <div class="dateControls" aria-label="तारीख और समय चुनें">
   <label for="chartDate">तारीख</label><input id="chartDate" type="date">
-  <label for="hourInput">समय (IST)</label><input id="hourInput" type="number" min="1" max="12" value="12" aria-label="घंटा" style="width:66px"><span>:</span><input id="minuteInput" type="number" min="0" max="59" value="00" aria-label="मिनट" style="width:70px"><select id="ampm" aria-label="AM या PM"><option value="AM">AM</option><option value="PM">PM</option></select>
+  <span class="timeGroup"><label for="hourInput">समय (IST)</label><input id="hourInput" type="number" min="1" max="12" value="12" aria-label="घंटा" style="width:66px"><span>:</span><input id="minuteInput" type="number" min="0" max="59" value="00" aria-label="मिनट" style="width:70px"><select id="ampm" aria-label="AM या PM"><option value="AM">AM</option><option value="PM">PM</option></select></span>
   <button id="todayBtn" type="button">आज का समय</button>
 </div>
 <div class="controls">
@@ -150,6 +150,7 @@ function render(){
    el.setAttribute("x",x);
    el.setAttribute("y",firstY+j*lineGap);
    el.setAttribute("class","planet");
+   if(items.length>=4) el.setAttribute("font-size","9");
    el.setAttribute("fill",p.color);
    el.textContent=p.short+" "+String(Math.floor(p.within)).padStart(2,"0")+"°";
    g.appendChild(el);
@@ -188,10 +189,10 @@ function calc(){
  }
  try{
   const selected=selectedChartDate();
-  const label=new Intl.DateTimeFormat("en-IN",{
-   timeZone:"Asia/Kolkata",dateStyle:"medium",timeStyle:"medium"
-  }).format(selected);
-  document.getElementById("time").textContent="चुना हुआ दिल्ली समय: "+label;
+  const dateLabel=new Intl.DateTimeFormat("en-IN",{timeZone:"Asia/Kolkata",dateStyle:"medium"}).format(selected);
+  const timeParts=new Intl.DateTimeFormat("en-IN",{timeZone:"Asia/Kolkata",hour:"numeric",minute:"2-digit",second:"2-digit",hour12:true}).formatToParts(selected);
+  const timeLabel=timeParts.map(part=>part.type==="dayPeriod"?`<span style="color:${part.value.toLowerCase()==="am"?"#2878D0":"#C65383"};font-weight:bold">${part.value}</span>`:part.value).join("");
+  document.getElementById("time").innerHTML="चुना हुआ दिल्ली समय: "+dateLabel+", "+timeLabel;
   dataCache=makeData(selected);render();
   document.getElementById("status").textContent="चुनी हुई तारीख की ग्रह-स्थिति · अनुमानित Lahiri अयनांश · दिल्ली";
  }catch(e){
