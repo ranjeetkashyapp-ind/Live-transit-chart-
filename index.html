@@ -12,16 +12,14 @@ header{text-align:center;margin:0 auto 12px;max-width:600px}
 .logoText{font-weight:700;font-size:22px;margin:4px 0;color:#b58120}
 h2{font-size:19px;text-align:center;margin:5px 0 12px}
 #time{text-align:center;color:var(--muted);font-size:13px;margin:8px 0 14px}
-.timeGroup{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}.dateControls{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;max-width:600px;margin:10px auto 14px;font-size:13px}.dateControls input,.dateControls select{font:inherit;padding:8px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
-#ampm{font-weight:bold;border:0;background:transparent;padding:2px 3px;color:#2878D0;min-width:42px}#ampm:has(option:checked[value="PM"]){color:#C65383}#ampm option[value="AM"]{color:#2878D0}#ampm option[value="PM"]{color:#C65383}
-.planet{font-size:10px;font-weight:bold;text-anchor:middle;paint-order:stroke;stroke:#fff;stroke-width:1.4px;stroke-linejoin:round}
+.dateControls{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;max-width:600px;margin:10px auto 14px;font-size:13px}.dateControls input{font:inherit;padding:8px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
 .controls{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin:10px auto 14px}
 button,select{font-size:14px;padding:9px 14px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
 button{background:#c98217;color:white;font-weight:bold;cursor:pointer}
 svg{display:block;width:100%;height:auto;max-width:600px;margin:auto}
 .frame{fill:none;stroke:var(--line);stroke-width:2}
 .house{font-size:15px;font-weight:bold;fill:#806c5b;text-anchor:middle}
-.planet{font-size:10px;font-weight:bold;text-anchor:middle;dominant-baseline:middle}
+.planet{font-size:11px;font-weight:bold;text-anchor:middle}
 #status{text-align:center;font-size:13px;color:var(--muted);margin:12px 0}
 .tableWrap{max-width:600px;margin:auto}
 table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
@@ -35,7 +33,7 @@ footer{text-align:center;margin:22px 0 8px;font-size:14px;color:#9b6b17;font-wei
 <div id="time">गणना हो रही है…</div>
 <div class="dateControls" aria-label="तारीख और समय चुनें">
   <label for="chartDate">तारीख</label><input id="chartDate" type="date">
-  <span class="timeGroup"><label for="hourInput">समय (IST)</label><input id="hourInput" type="number" min="1" max="12" value="12" aria-label="घंटा" style="width:66px"><span>:</span><input id="minuteInput" type="number" min="0" max="59" value="00" aria-label="मिनट" style="width:70px"><select id="ampm" aria-label="AM या PM"><option value="AM">AM</option><option value="PM">PM</option></select></span>
+  <label for="chartTime">समय (IST)</label><input id="chartTime" type="time" step="60">
   <button id="todayBtn" type="button">आज का समय</button>
 </div>
 <div class="controls">
@@ -109,19 +107,8 @@ function makeData(now){
 }
 // केंद्र-बिंदु: उत्तर भारतीय कुंडली के 12 वास्तविक खानों में, राशि 1 से 12 के क्रम में।
 const positions=[
- // 12 भावों के अंदरूनी केंद्र; हर बिंदु रेखाओं से दूर रखा गया है।
- [200,92],   // 1: ऊपर बीच
- [125,145],  // 2: ऊपर-बायाँ
- [105,200],  // 3: बायाँ बीच
- [125,270],  // 4: नीचे-बायाँ
- [200,310],  // 5: नीचे बीच-बायाँ
- [200,350],  // 6: सबसे नीचे
- [275,310],  // 7: नीचे बीच-दायाँ
- [315,270],  // 8: नीचे-दायाँ
- [295,200],  // 9: दायाँ बीच
- [275,145],  // 10: ऊपर-दायाँ
- [200,55],   // 11: ऊपर का शीर्ष
- [160,92]    // 12: ऊपर-बायाँ अंदर
+ [132,126],[76,160],[106,245],[76,292],[132,330],[200,306],
+ [268,330],[324,292],[294,245],[324,160],[268,126],[200,72]
 ];
 let dataCache=[];
 function render(){
@@ -139,18 +126,14 @@ function render(){
   const h=document.createElementNS("http://www.w3.org/2000/svg","text");
   h.setAttribute("x",x);h.setAttribute("y",y);h.setAttribute("class","house");
   h.textContent=String(signNo);g.appendChild(h);
-  // राशि अंक को भाव के ऊपरी हिस्से में रखें; ग्रहों को उसके नीचे स्टैक करें।
-  h.setAttribute("y",y-17);
-  // Keep each planet label in its own line within the same bhava.
-  // Tighten spacing only when a house contains several planets; never change chart geometry.
-  const lineGap = items.length >= 5 ? 10 : (items.length >= 3 ? 12 : 14);
-  const firstY = y + 2;
+  // राशि नंबर ऊपर रखें और ग्रहों की सूची भाव के सुरक्षित अंदरूनी हिस्से में रखें।
+  const lineGap = items.length >= 5 ? 11 : (items.length >= 3 ? 13 : 15);
+  const startY = y + 16;
   items.forEach((p,j)=>{
    const el=document.createElementNS("http://www.w3.org/2000/svg","text");
    el.setAttribute("x",x);
-   el.setAttribute("y",firstY+j*lineGap);
+   el.setAttribute("y",startY+j*lineGap);
    el.setAttribute("class","planet");
-   if(items.length>=4) el.setAttribute("font-size","9");
    el.setAttribute("fill",p.color);
    el.textContent=p.short+" "+String(Math.floor(p.within)).padStart(2,"0")+"°";
    g.appendChild(el);
@@ -166,21 +149,14 @@ function currentDelhiParts(){
   hour:"2-digit",minute:"2-digit",hourCycle:"h23"
  }).formatToParts(new Date());
  const o={};parts.forEach(p=>o[p.type]=p.value);
- let h=Number(o.hour),period=h>=12?"PM":"AM";h=h%12||12;
- return {date:`${o.year}-${o.month}-${o.day}`,hour:String(h),minute:o.minute,period};
+ return {date:`${o.year}-${o.month}-${o.day}`,time:`${o.hour}:${o.minute}`};
 }
 function selectedChartDate(){
  const d=document.getElementById("chartDate").value;
- const hRaw=Number(document.getElementById("hourInput").value);
- const mRaw=Number(document.getElementById("minuteInput").value);
- const period=document.getElementById("ampm").value;
- if(!d||!Number.isFinite(hRaw)||!Number.isFinite(mRaw))return new Date();
- const h12=Math.max(1,Math.min(12,hRaw));
- const minute=Math.max(0,Math.min(59,mRaw));
- const h24=(h12%12)+(period==="PM"?12:0);
- const hm=String(h24).padStart(2,"0"),mm=String(minute).padStart(2,"0");
+ const t=document.getElementById("chartTime").value;
+ if(!d||!t)return new Date();
  // Convert Delhi IST (+05:30) explicitly, independent of the phone's timezone.
- return new Date(`${d}T${hm}:${mm}:00+05:30`);
+ return new Date(`${d}T${t}:00+05:30`);
 }
 function calc(){
  if(!window.Astronomy){
@@ -189,10 +165,10 @@ function calc(){
  }
  try{
   const selected=selectedChartDate();
-  const dateLabel=new Intl.DateTimeFormat("en-IN",{timeZone:"Asia/Kolkata",dateStyle:"medium"}).format(selected);
-  const timeParts=new Intl.DateTimeFormat("en-IN",{timeZone:"Asia/Kolkata",hour:"numeric",minute:"2-digit",second:"2-digit",hour12:true}).formatToParts(selected);
-  const timeLabel=timeParts.map(part=>part.type==="dayPeriod"?`<span style="color:${part.value.toLowerCase()==="am"?"#2878D0":"#C65383"};font-weight:bold">${part.value}</span>`:part.value).join("");
-  document.getElementById("time").innerHTML="चुना हुआ दिल्ली समय: "+dateLabel+", "+timeLabel;
+  const label=new Intl.DateTimeFormat("en-IN",{
+   timeZone:"Asia/Kolkata",dateStyle:"medium",timeStyle:"medium"
+  }).format(selected);
+  document.getElementById("time").textContent="चुना हुआ दिल्ली समय: "+label;
   dataCache=makeData(selected);render();
   document.getElementById("status").textContent="चुनी हुई तारीख की ग्रह-स्थिति · अनुमानित Lahiri अयनांश · दिल्ली";
  }catch(e){
@@ -203,13 +179,11 @@ function calc(){
 function setToday(){
  const p=currentDelhiParts();
  document.getElementById("chartDate").value=p.date;
- document.getElementById("hourInput").value=p.hour;
- document.getElementById("minuteInput").value=p.minute;
- document.getElementById("ampm").value=p.period;
+ document.getElementById("chartTime").value=p.time;
  calc();
 }
 document.getElementById("chartDate").addEventListener("change",calc);
-for(const id of ["hourInput","minuteInput","ampm"])document.getElementById(id).addEventListener("change",calc);
+document.getElementById("chartTime").addEventListener("change",calc);
 document.getElementById("todayBtn").addEventListener("click",setToday);
 document.getElementById("rotateBackBtn").addEventListener("click",()=>{
  const sel=document.getElementById("rotation");
@@ -225,9 +199,7 @@ setInterval(()=>{
  const inputs=currentDelhiParts();
  // Keep the current-time chart refreshed each minute; historical/future selections stay fixed.
  if(document.getElementById("chartDate").value===inputs.date &&
-    document.getElementById("hourInput").value===inputs.hour &&
-    document.getElementById("minuteInput").value===inputs.minute &&
-    document.getElementById("ampm").value===inputs.period) setToday();
+    document.getElementById("chartTime").value===inputs.time) setToday();
 },60000);
 </script>
 </body>
