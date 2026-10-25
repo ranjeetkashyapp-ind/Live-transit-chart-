@@ -1,51 +1,283 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Live Transit Chart</title>
+<title>Live Vedic Transit Chart</title>
 <style>
-body{font-family:Arial,sans-serif;background:#fff8ed;color:#392514;text-align:center;margin:0;padding:16px}
-h2{color:#a64b12}
-#clock{font-size:18px;margin:12px}
-svg{width:100%;max-width:420px;height:auto}
-.chart{fill:#fffdf8;stroke:#b65b20;stroke-width:2}
-.line{fill:none;stroke:#b65b20;stroke-width:1.5}
-.cell{font-size:13px;fill:#392514;text-anchor:middle}
-.note{font-size:14px;line-height:1.5}
+:root {
+  --bg: #fff8ed;
+  --ink: #392514;
+  --line: #b65b20;
+  --muted: #806c5b;
+  --accent: #a64b12;
+  --gold: #f0b943;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Arial, sans-serif;
+}
+header {
+  background: var(--bg);
+  padding: 20px 18px 12px;
+  border-bottom: 1px solid #ead8c4;
+}
+h1 { font-size: 23px; margin: 0; color: var(--accent); }
+#clock { font-size: 13px; margin-top: 8px; color: var(--muted); }
+nav {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 14px;
+}
+nav button {
+  flex: 0 0 auto;
+  padding: 12px 18px;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 15px;
+}
+nav button.active {
+  background: var(--gold);
+  border-color: var(--gold);
+}
+main { padding: 0 14px 24px; }
+.panel {
+  border: 1.5px solid #d7b99d;
+  border-radius: 22px;
+  padding: 16px 12px;
+  margin-bottom: 18px;
+}
+h2 { font-size: 19px; margin: 2px 0 12px; }
+.chart {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.chart-bg {
+  fill: var(--bg);
+  stroke: var(--line);
+  stroke-width: 1.8;
+}
+.chart-line {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 1.5;
+}
+.house {
+  fill: var(--muted);
+  font-size: 12px;
+  text-anchor: middle;
+}
+.planet {
+  font-size: 13px;
+  font-weight: bold;
+  text-anchor: middle;
+}
+.as { fill: #d56a20; }
+.su { fill: #d69b17; }
+.mo { fill: #8060b8; }
+.ma { fill: #d94c54; }
+.me { fill: #526ed6; }
+.ju { fill: #a77917; }
+.ve { fill: #d84b70; }
+.sa { fill: #777064; }
+.ra { fill: #348c79; }
+.ke { fill: #a05bc4; }
+.note {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.tabpage { display: none; }
+.tabpage.active { display: block; }
+table { width: 100%; border-collapse: collapse; }
+td, th {
+  padding: 10px 5px;
+  border-bottom: 1px solid #ead8c4;
+  text-align: left;
+  font-size: 14px;
+}
+th { color: var(--accent); }
+footer {
+  padding: 16px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+}
 </style>
 </head>
 <body>
-<h2>Live Vedic Transit Chart</h2>
-<div id="clock"></div>
-<svg viewBox="0 0 400 400" role="img" aria-label="North Indian diamond chart">
-<rect x="10" y="10" width="380" height="380" class="chart"/>
-<path d="M10 10 L390 390 M390 10 L10 390 M200 10 L390 200 L200 390 L10 200 Z" class="line"/>
-<path d="M200 10 L200 390 M10 200 L390 200" class="line"/>
-<text x="200" y="90" class="cell">1</text>
-<text x="100" y="65" class="cell">2</text>
-<text x="55" y="130" class="cell">3</text>
-<text x="100" y="205" class="cell">4</text>
-<text x="55" y="280" class="cell">5</text>
-<text x="100" y="345" class="cell">6</text>
-<text x="200" y="315" class="cell">7</text>
-<text x="300" y="345" class="cell">8</text>
-<text x="345" y="280" class="cell">9</text>
-<text x="300" y="205" class="cell">10</text>
-<text x="345" y="130" class="cell">11</text>
-<text x="300" y="65" class="cell">12</text>
-<text x="200" y="190" class="cell">Transit</text>
-</svg>
-<p class="note">Chart layout preview only. Planetary positions will be added in the next step.</p>
+
+<header>
+  <h1>Vedic Kundli</h1>
+  <div id="clock">Loading India time…</div>
+</header>
+
+<nav>
+  <button class="active" data-tab="basic">Basic</button>
+  <button data-tab="charts">Charts</button>
+  <button data-tab="planets">Planets</button>
+  <button data-tab="panchang">Panchang</button>
+</nav>
+
+<main>
+  <section id="basic" class="tabpage active">
+    <div class="panel">
+      <h2>Live Transit Chart</h2>
+      <p>Vedic astrology chart preview</p>
+      <p class="note">Location: Delhi, India<br>
+      Time zone: Indian Standard Time (IST)</p>
+    </div>
+    <div class="panel">
+      <h2>Chart Details</h2>
+      <p>Chart style: North Indian</p>
+      <p>Ayanamsha: Lahiri (calculation to be connected)</p>
+    </div>
+  </section>
+
+  <section id="charts" class="tabpage">
+    <div class="panel">
+      <h2>Ascendant Chart</h2>
+      <svg class="chart" viewBox="0 0 400 400"
+           role="img" aria-label="North Indian ascendant chart">
+        <rect class="chart-bg" x="2" y="2" width="396" height="396"/>
+        <path class="chart-line"
+          d="M2 2 L398 398 M398 2 L2 398
+             M200 2 L398 200 L200 398 L2 200 Z"/>
+        <path class="chart-line"
+          d="M200 2 L200 398 M2 200 L398 200"/>
+        <text class="house" x="200" y="38">1</text>
+        <text class="house" x="105" y="48">2</text>
+        <text class="house" x="40" y="112">3</text>
+        <text class="house" x="105" y="202">4</text>
+        <text class="house" x="40" y="292">5</text>
+        <text class="house" x="105" y="365">6</text>
+        <text class="house" x="200" y="365">7</text>
+        <text class="house" x="295" y="365">8</text>
+        <text class="house" x="360" y="292">9</text>
+        <text class="house" x="295" y="202">10</text>
+        <text class="house" x="360" y="112">11</text>
+        <text class="house" x="295" y="48">12</text>
+        <text class="planet as" x="200" y="95">As —</text>
+        <text class="planet sa" x="105" y="75">Sa —</text>
+        <text class="planet ke" x="250" y="95">Ke —</text>
+        <text class="planet ve" x="45" y="205">Ve —</text>
+        <text class="planet mo" x="295" y="205">Mo —</text>
+        <text class="planet su" x="145" y="300">Su —</text>
+        <text class="planet me" x="200" y="300">Me —</text>
+        <text class="planet ra" x="250" y="300">Ra —</text>
+        <text class="planet ju" x="350" y="300">Ju —</text>
+        <text class="planet ma" x="355" y="205">Ma —</text>
+      </svg>
+      <p class="note">“—” means the planetary degree is not yet calculated.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Moon Chart</h2>
+      <svg class="chart" viewBox="0 0 400 400"
+           role="img" aria-label="North Indian moon chart">
+        <rect class="chart-bg" x="2" y="2" width="396" height="396"/>
+        <path class="chart-line"
+          d="M2 2 L398 398 M398 2 L2 398
+             M200 2 L398 200 L200 398 L2 200 Z"/>
+        <path class="chart-line"
+          d="M200 2 L200 398 M2 200 L398 200"/>
+        <text class="house" x="200" y="38">1</text>
+        <text class="house" x="105" y="48">2</text>
+        <text class="house" x="40" y="112">3</text>
+        <text class="house" x="105" y="202">4</text>
+        <text class="house" x="40" y="292">5</text>
+        <text class="house" x="105" y="365">6</text>
+        <text class="house" x="200" y="365">7</text>
+        <text class="house" x="295" y="365">8</text>
+        <text class="house" x="360" y="292">9</text>
+        <text class="house" x="295" y="202">10</text>
+        <text class="house" x="360" y="112">11</text>
+        <text class="house" x="295" y="48">12</text>
+        <text class="planet mo" x="200" y="95">Mo —</text>
+        <text class="planet as" x="255" y="95">As —</text>
+        <text class="planet ma" x="300" y="65">Ma —</text>
+        <text class="planet ju" x="345" y="65">Ju —</text>
+        <text class="planet ke" x="100" y="110">Ke —</text>
+        <text class="planet sa" x="45" y="205">Sa —</text>
+        <text class="planet su" x="150" y="300">Su —</text>
+        <text class="planet me" x="205" y="300">Me —</text>
+        <text class="planet ra" x="255" y="300">Ra —</text>
+      </svg>
+      <p class="note">Moon chart preview. Planetary positions are not connected yet.</p>
+    </div>
+  </section>
+
+  <section id="planets" class="tabpage">
+    <div class="panel">
+      <h2>Planetary Positions</h2>
+      <table>
+        <thead><tr><th>Planet</th><th>Sign</th><th>Degree</th></tr></thead>
+        <tbody>
+          <tr><td>Sun</td><td>—</td><td>—</td></tr>
+          <tr><td>Moon</td><td>—</td><td>—</td></tr>
+          <tr><td>Mars</td><td>—</td><td>—</td></tr>
+          <tr><td>Mercury</td><td>—</td><td>—</td></tr>
+          <tr><td>Jupiter</td><td>—</td><td>—</td></tr>
+          <tr><td>Venus</td><td>—</td><td>—</td></tr>
+          <tr><td>Saturn</td><td>—</td><td>—</td></tr>
+          <tr><td>Rahu</td><td>—</td><td>—</td></tr>
+          <tr><td>Ketu</td><td>—</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="panchang" class="tabpage">
+    <div class="panel">
+      <h2>Panchang</h2>
+      <p id="date"></p>
+      <p class="note">Tithi, Nakshatra, Yoga and Karana need a verified
+      astronomical calculation before being displayed.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  North Indian Kundli · India Standard Time
+</footer>
+
 <script>
-function updateClock(){
- document.getElementById('clock').textContent =
- 'India Time: '+new Intl.DateTimeFormat('en-IN',{
- timeZone:'Asia/Kolkata',dateStyle:'medium',timeStyle:'medium'
- }).format(new Date());
+function updateTime() {
+  const now = new Date();
+  document.getElementById("clock").textContent =
+    "India Time: " + new Intl.DateTimeFormat("en-IN", {
+      timeZone: "Asia/Kolkata",
+      dateStyle: "medium",
+      timeStyle: "medium"
+    }).format(now);
+  document.getElementById("date").textContent =
+    new Intl.DateTimeFormat("en-IN", {
+      timeZone: "Asia/Kolkata",
+      dateStyle: "full"
+    }).format(now);
 }
-updateClock();
-setInterval(updateClock,1000);
+updateTime();
+setInterval(updateTime, 1000);
+
+document.querySelectorAll("nav button").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll("nav button").forEach(b =>
+      b.classList.remove("active"));
+    document.querySelectorAll(".tabpage").forEach(page =>
+      page.classList.remove("active"));
+    button.classList.add("active");
+    document.getElementById(button.dataset.tab)
+      .classList.add("active");
+  });
+});
 </script>
 </body>
 </html>
