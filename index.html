@@ -1,154 +1,190 @@
-
 <!DOCTYPE html>
 <html lang="hi">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Live Vedic Kundli</title>
+<meta name="theme-color" content="#ffffff">
+<title>Live Transit Chart | Astro Plus</title>
 <style>
-:root {
-  --bg:#fff8ed;
-  --line:#a85d2b;
-  --ink:#392514;
-  --muted:#806c5b;
-}
+:root{--gold:#c99a28;--gold-dark:#9c7418;--ink:#222;--muted:#666;--line:#c99a28;--paper:#fff}
 *{box-sizing:border-box}
-body{
-  margin:0;padding:16px;
-  background:var(--bg);color:var(--ink);
-  font-family:Arial,sans-serif;
-}
-h2{font-size:20px;text-align:center;margin:6px 0}
-#time{text-align:center;color:var(--muted);font-size:13px;margin:8px 0 16px}
-svg{display:block;width:100%;height:auto;max-width:600px;margin:auto}
-.frame{fill:none;stroke:var(--line);stroke-width:1.5}
-.house{font-size:12px;fill:var(--muted);text-anchor:middle}
-.planet{font-size:12px;font-weight:bold;text-anchor:middle}
-#status{text-align:center;font-size:13px;color:var(--muted);margin:12px 0}
-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
-th,td{text-align:left;padding:8px 4px;border-bottom:1px solid #e6d4bf}
-th{color:var(--line)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans Devanagari",Arial,sans-serif}
+.wrap{max-width:760px;margin:auto;padding:16px 12px 24px}
+header{text-align:center;padding:8px 0 12px}
+.logo-mark{width:42px;height:42px;border:2px solid var(--gold);border-radius:50%;display:inline-grid;place-items:center;color:var(--gold-dark);font-size:24px;font-weight:700}
+.brand{font-weight:800;letter-spacing:2px;font-size:21px;margin-top:4px}
+.subtitle{font-size:18px;font-weight:700;margin-top:8px}
+.meta{font-size:12px;color:var(--muted);margin-top:5px}
+.controls{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 0}
+button,select{border:1px solid var(--gold);background:#fff;color:#5d4610;border-radius:8px;padding:9px 13px;font-size:14px}
+button{background:var(--gold);color:#fff;font-weight:700;cursor:pointer}
+button:disabled{opacity:.55}
+#status{font-size:12px;color:var(--muted);text-align:center;min-height:18px;margin-bottom:8px}
+.chart-wrap{width:100%;max-width:590px;margin:0 auto}
+svg{display:block;width:100%;height:auto;background:#fff}
+.frame{fill:#fff;stroke:var(--line);stroke-width:2.5}
+.fixed-line{fill:none;stroke:var(--line);stroke-width:1.8}
+.house-text{font-size:11px;fill:#9c7418;text-anchor:middle}
+.sign-text{font-size:11px;fill:#8b6b21;text-anchor:middle}
+.planet-text{font-size:14px;font-weight:700;text-anchor:middle;fill:#222}
+.degree-text{font-size:11px;text-anchor:middle;fill:#333}
+#planet-list{width:100%;max-width:590px;margin:14px auto 0;border-collapse:collapse;font-size:14px}
+#planet-list th,#planet-list td{padding:8px 9px;border-bottom:1px solid #eee;text-align:left}
+#planet-list th{background:#fff8e8;color:#735515}
+.pname{font-weight:700}
+.foot{text-align:center;font-size:13px;margin-top:18px;color:#555}
+.foot a{color:#9c7418;text-decoration:none;font-weight:700}
+.note{font-size:11px;line-height:1.5;color:#777;text-align:center;margin:10px auto 0;max-width:590px}
+@media(max-width:380px){.wrap{padding:10px 7px}.subtitle{font-size:16px}.planet-text{font-size:12px}.degree-text{font-size:10px}}
 </style>
 </head>
 <body>
-<h2>Live Vedic Kundli</h2>
-<div id="time">गणना हो रही है…</div>
-<svg id="chart" viewBox="0 0 400 400" aria-label="उत्तर भारतीय कुंडली">
-  <rect class="frame" x="2" y="2" width="396" height="396"/>
-  <path class="frame" d="M2 2L398 398 M398 2L2 398
-    M200 2L398 200L200 398L2 200Z"/>
-  <g id="labels"></g>
+<div class="wrap">
+<header>
+  <div class="logo-mark" aria-label="Astro Plus">ॐ</div>
+  <div class="brand">ASTRO PLUS</div>
+  <div class="subtitle">Live Transit Chart</div>
+  <div class="meta">दिल्ली, भारत · Lahiri Ayanamsha · IST</div>
+</header>
+<div class="controls">
+  <button id="rotateBtn" type="button">Rotate Chart ↻</button>
+  <label for="rotateStep">Rotate:</label>
+  <select id="rotateStep" aria-label="Rotate chart angle">
+    <option value="0">0°</option><option value="30">30°</option><option value="60">60°</option>
+    <option value="90">90°</option><option value="120">120°</option><option value="150">150°</option>
+    <option value="180">180°</option><option value="210">210°</option><option value="240">240°</option>
+    <option value="270">270°</option><option value="300">300°</option><option value="330">330°</option>
+  </select>
+</div>
+<div id="status" role="status">Live planetary positions load ho rahe hain…</div>
+<div class="chart-wrap">
+<svg id="kundli" viewBox="0 0 600 600" role="img" aria-label="North Indian Vedic transit chart">
+  <rect class="frame" x="10" y="10" width="580" height="580"/>
+  <path class="fixed-line" d="M10 10 L590 590 M590 10 L10 590 M300 10 L590 300 L300 590 L10 300 Z"/>
+  <g id="chartData"></g>
 </svg>
-<div id="status">ग्रहों की स्थिति लोड हो रही है…</div>
-<table>
-<thead><tr><th>ग्रह</th><th>राशि</th><th>डिग्री</th></tr></thead>
-<tbody id="rows"></tbody>
+</div>
+<table id="planet-list">
+<thead><tr><th>ग्रह</th><th>राशि</th><th>डिग्री</th><th>भाव</th></tr></thead>
+<tbody id="planetRows"><tr><td colspan="4">Calculating…</td></tr></tbody>
 </table>
-
-<script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
-<script>
-const signs=["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या",
-"तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
-
-const planets=[
- ["Sun","सूर्य","#c17b16"],
- ["Moon","चंद्र","#8060b8"],
- ["Mercury","बुध","#526ed6"],
- ["Venus","शुक्र","#d84b70"],
- ["Mars","मंगल","#d94c54"],
- ["Jupiter","गुरु","#a77917"],
- ["Saturn","शनि","#777064"]
+<div class="note">गणना browser में Vedic ephemeris library से होती है। सही परिणाम के लिए इंटरनेट आवश्यक है। यह ज्योतिषीय जानकारी है; किसी महत्वपूर्ण निर्णय से पहले मान्य पंचांग/एपhemeris से मिलान करें।</div>
+<div class="foot">Visit <a href="https://astroplus.in" target="_blank" rel="noopener">astroplus.in</a></div>
+</div>
+<script type="module">
+const LAT = 28.6139, LON = 77.2090; // Delhi
+const rashiHindi = ["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
+const short = {Sun:"सू",Moon:"चं",Mars:"मं",Mercury:"बु",Jupiter:"गु",Venus:"शु",Saturn:"श",Rahu:"रा",Ketu:"के"};
+const hindi = {Sun:"सूर्य",Moon:"चंद्र",Mars:"मंगल",Mercury:"बुध",Jupiter:"गुरु",Venus:"शुक्र",Saturn:"शनि",Rahu:"राहु",Ketu:"केतु"};
+const colors = {Sun:"#c0392b",Moon:"#2471a3",Mars:"#d35400",Mercury:"#16805d",Jupiter:"#8e44ad",Venus:"#b03a7a",Saturn:"#34495e",Rahu:"#795548",Ketu:"#7f8c8d"};
+const NS = "http://www.w3.org/2000/svg";
+const chartData = document.getElementById("chartData");
+const rows = document.getElementById("planetRows");
+const statusEl = document.getElementById("status");
+let rotation = 0, latest = null;
+const houses = [
+  {x:300,y:78, house:1},{x:155,y:145,house:2},{x:78,y:300,house:3},
+  {x:155,y:455,house:4},{x:300,y:522,house:5},{x:445,y:455,house:6},
+  {x:522,y:300,house:7},{x:445,y:145,house:8},{x:205,y:205,house:9},
+  {x:395,y:205,house:10},{x:395,y:395,house:11},{x:205,y:395,house:12}
 ];
-
-// Lahiri ayanamsha approximate polynomial, degrees.
-function ayanamsha(date){
- const y=date.getUTCFullYear()+
- (date.getUTCMonth()+0.5)/12;
- const t=(y-2000)/100;
- return 23.853055+1.3969713*t+0.0003086*t*t;
-}
-function norm(x){return ((x%360)+360)%360}
-function degText(x){
- const d=Math.floor(x),m=Math.floor((x-d)*60);
- const s=Math.floor((((x-d)*60)-m)*60);
- return `${d}° ${m}' ${s}"`;
-}
-function siderealLongitude(body,date){
- const v=Astronomy.GeoVector(body,date,true);
- return norm(Astronomy.Ecliptic(v).elon-ayanamsha(date));
-}
-function calc(){
- if(!window.Astronomy){
-  document.getElementById("status").textContent=
-   "गणना लाइब्रेरी लोड नहीं हुई। इंटरनेट जाँचकर पेज Refresh करें।";
-  return;
- }
- try{
-  const now=new Date();
-  const date=new Date(now.toLocaleString("en-US",{timeZone:"Asia/Kolkata"}));
-  document.getElementById("time").textContent=
-   "दिल्ली समय: "+new Intl.DateTimeFormat("en-IN",{
-    timeZone:"Asia/Kolkata",dateStyle:"medium",timeStyle:"medium"
-   }).format(now);
-
-  const ay=ayanamsha(now);
-  const data=planets.map(([body,name,color])=>{
-   const lon=siderealLongitude(Astronomy.Body[body],now);
-   return {name,color,lon,sign:Math.floor(lon/30),within:lon%30};
-  });
-
-  // Mean lunar node approximation
-  const jd=now.getTime()/86400000+2440587.5;
-  const T=(jd-2451545)/36525;
-  const rahu=norm(125.04452-1934.136261*T+0.0020708*T*T+T*T*T/450000);
-  data.push({name:"राहु",color:"#348c79",lon:norm(rahu-ay),
-   sign:Math.floor(norm(rahu-ay)/30),within:norm(rahu-ay)%30});
-  const klon=norm(rahu-ay+180);
-  data.push({name:"केतु",color:"#a05bc4",lon:klon,
-   sign:Math.floor(klon/30),within:klon%30});
-
-  // Chart is a clean North Indian diamond; planetary signs are shown
-  // in their sign cells. Ascendant requires a separate horizon calculation.
-  const positions=[
-   [200,55],[105,60],[45,120],[105,200],
-   [45,285],[105,345],[200,345],[295,345],
-   [355,285],[295,200],[355,120],[295,60]
-  ];
-  const bySign=Array.from({length:12},()=>[]);
-  data.forEach(p=>bySign[p.sign].push(p));
-
-  const g=document.getElementById("labels");
-  g.innerHTML="";
-  for(let i=0;i<12;i++){
-   const [x,y]=positions[i];
-   const h=document.createElementNS("http://www.w3.org/2000/svg","text");
-   h.setAttribute("x",x);h.setAttribute("y",y);
-   h.setAttribute("class","house");
-   h.textContent=String(i+1);
-   g.appendChild(h);
-   bySign[i].forEach((p,j)=>{
-    const el=document.createElementNS("http://www.w3.org/2000/svg","text");
-    el.setAttribute("x",x);
-    el.setAttribute("y",y+16+(j*14));
-    el.setAttribute("class","planet");
-    el.setAttribute("fill",p.color);
-    el.textContent=p.name;
-    g.appendChild(el);
-   });
+// North Indian chart house centers (houses 1,4,7,10 are the diamond tips)
+const houseCenters = [
+  [300,112],[165,165],[100,300],[165,435],[300,488],[435,435],
+  [500,300],[435,165],[300,205],[395,300],[300,395],[205,300]
+];
+function el(tag, attrs={}, text=""){const n=document.createElementNS(NS,tag);for(const [k,v] of Object.entries(attrs))n.setAttribute(k,v);if(text!=="")n.textContent=text;return n}
+function degText(v){let d=((v%30)+30)%30;return String(Math.floor(d)).padStart(2,"0")+"°"}
+function norm(v){return ((v%360)+360)%360}
+function signOf(longitude){return Math.floor(norm(longitude)/30)}
+function signDegree(longitude){return norm(longitude)%30}
+function formatDegree(longitude){return degText(longitude)}
+function getRashiName(p){return p?.rashi?.name || rashiHindi[signOf(p?.longitude ?? 0)]}
+function getLongitude(p){if(typeof p?.longitude==="number")return p.longitude;if(typeof p?.siderealLongitude==="number")return p.siderealLongitude;if(typeof p?.rashiDeg==="number"&&typeof p?.rashi?.index==="number")return p.rashi.index*30+p.rashiDeg;return 0}
+function draw(snapshot, lagna){
+  chartData.replaceChildren();
+  const lagnaLon = getLongitude(lagna);
+  const ascSign = signOf(lagnaLon);
+  const all = snapshot.planets || {};
+  const entries = Object.keys(short).map(key=>{
+    let p = all[key] || all[key.toLowerCase()] || null;
+    if(key==="Rahu" && !p) p = all.NorthNode || all.northNode;
+    if(key==="Ketu" && !p) p = all.SouthNode || all.southNode;
+    return p ? {key, p, lon:getLongitude(p)} : null;
+  }).filter(Boolean);
+  const lagnaHouse = {key:"Lagna",p:lagna,lon:lagnaLon};
+  const byHouse = Array.from({length:12},()=>[]);
+  byHouse[0].push(lagnaHouse);
+  for(const item of entries){
+    const sign=signOf(item.lon);
+    const house=((sign-ascSign+12)%12);
+    byHouse[house].push(item);
   }
-
-  document.getElementById("rows").innerHTML=data.map(p=>
-   `<tr><td>${p.name}</td><td>${signs[p.sign]}</td><td>${degText(p.within)}</td></tr>`
-  ).join("");
-  document.getElementById("status").textContent=
-   "ग्रहों की अनुमानित खगोलीय गणना · Lahiri ayanamsha";
- }catch(e){
-  document.getElementById("status").textContent=
-   "गणना में त्रुटि हुई। लाइब्रेरी/API जाँच की ज़रूरत है।";
- }
+  const signLabels = document.createDocumentFragment();
+  byHouse.forEach((items,i)=>{
+    const [x,y]=houseCenters[i];
+    const sign=(ascSign+i)%12;
+    chartData.appendChild(el("text",{x,y:y-21,class:"sign-text"},rashiHindi[sign]));
+    chartData.appendChild(el("text",{x,y:y-5,class:"house-text"},"भाव "+(i+1)));
+    items.forEach((item,j)=>{
+      const py=y+15+j*18;
+      const label=item.key==="Lagna"?"लग्न":short[item.key];
+      const color=item.key==="Lagna"?"#9c7418":(colors[item.key]||"#222");
+      chartData.appendChild(el("text",{x,y:py,class:"planet-text",fill:color},label));
+      if(item.key!=="Lagna")chartData.appendChild(el("text",{x,y:py+12,class:"degree-text"},formatDegree(item.lon)));
+    });
+  });
+  rows.replaceChildren();
+  const addRow=(name,color,sign,longitude,house)=>{
+    const tr=document.createElement("tr");
+    const cells=[
+      {text:name,cls:"pname",color},
+      {text:rashiHindi[sign]},
+      {text:formatDegree(longitude)},
+      {text:String(house)}
+    ];
+    cells.forEach((cell,index)=>{
+      const td=document.createElement("td");
+      td.textContent=cell.text;
+      if(cell.cls) td.className=cell.cls;
+      if(cell.color) td.style.color=cell.color;
+      tr.appendChild(td);
+    });
+    rows.appendChild(tr);
+  };
+  addRow("लग्न","#9c7418",ascSign,lagnaLon,1);
+  entries.forEach(item=>{
+    const sign=signOf(item.lon), house=((sign-ascSign+12)%12)+1;
+    addRow(`${hindi[item.key]} (${short[item.key]})`,colors[item.key],sign,item.lon,house);
+  });
 }
-calc();
-setInterval(calc,60000);
+async function calculate(){
+  statusEl.textContent="Live positions calculate ho rahe hain…";
+  try{
+    // Browser ESM library calculates sidereal positions and ascendant from the current instant.
+    const mod = await import("https://esm.sh/vedic-ephemeris");
+    const instant = new Date();
+    const snapshot = mod.getSkySnapshot();
+    const lagna = mod.getAscendant({date:instant,lat:LAT,lon:LON});
+    if(!snapshot || !snapshot.planets || !lagna) throw new Error("Calculation data unavailable");
+    latest={snapshot,lagna};
+    draw(snapshot,lagna);
+    statusEl.textContent="Live calculation updated: "+new Intl.DateTimeFormat("en-IN",{dateStyle:"medium",timeStyle:"medium",timeZone:"Asia/Kolkata"}).format(new Date())+" IST · Delhi";
+  }catch(err){
+    console.error(err);
+    statusEl.textContent="Calculation library load nahi hui. Internet connection check karke page refresh karein.";
+    rows.innerHTML='<tr><td colspan="4">Live calculation load nahi ho saki. Internet connection check karein.</td></tr>';
+  }
+}
+function applyRotation(){chartData.setAttribute("transform",`rotate(${rotation} 300 300)`)}
+document.getElementById("rotateBtn").addEventListener("click",()=>{
+  rotation=(rotation+30)%360;
+  document.getElementById("rotateStep").value=String(rotation);
+  applyRotation();
+});
+document.getElementById("rotateStep").addEventListener("change",e=>{rotation=Number(e.target.value)||0;applyRotation()});
+calculate();
+setInterval(calculate,60000);
 </script>
 </body>
 </html>
