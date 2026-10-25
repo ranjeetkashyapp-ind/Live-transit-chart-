@@ -17,8 +17,8 @@ button,select{font-size:14px;padding:9px 14px;border:1px solid var(--line);borde
 button{background:#c98217;color:white;font-weight:bold;cursor:pointer}
 svg{display:block;width:100%;height:auto;max-width:600px;margin:auto}
 .frame{fill:none;stroke:var(--line);stroke-width:2}
-.house{font-size:16px;font-weight:bold;fill:#806c5b;text-anchor:middle}
-.planet{font-size:13px;font-weight:bold;text-anchor:middle}
+.house{font-size:15px;font-weight:bold;fill:#806c5b;text-anchor:middle}
+.planet{font-size:11px;font-weight:bold;text-anchor:middle}
 #status{text-align:center;font-size:13px;color:var(--muted);margin:12px 0}
 .tableWrap{max-width:600px;margin:auto}
 table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
@@ -99,9 +99,10 @@ function makeData(now){
  data.push({name:"लग्न",short:"ल",color:"#111111",lon:asc,sign:Math.floor(asc/30),within:asc%30,isAsc:true});
  return data;
 }
+// केंद्र-बिंदु: उत्तर भारतीय कुंडली के 12 वास्तविक खानों में, राशि 1 से 12 के क्रम में।
 const positions=[
- [200,48],[104,60],[48,120],[104,200],[48,280],[104,340],
- [200,352],[296,340],[352,280],[296,200],[352,120],[296,60]
+ [132,126],[76,160],[106,245],[76,292],[132,330],[200,306],
+ [268,330],[324,292],[294,245],[324,160],[268,126],[200,72]
 ];
 let dataCache=[];
 function render(){
@@ -119,18 +120,15 @@ function render(){
   const h=document.createElementNS("http://www.w3.org/2000/svg","text");
   h.setAttribute("x",x);h.setAttribute("y",y);h.setAttribute("class","house");
   h.textContent=String(signNo);g.appendChild(h);
-  // Keep planet labels inside each bhava. Spread labels around the sign number,
-  // using compact spacing when several planets share one bhava.
+  // राशि नंबर ऊपर रखें और ग्रहों की सूची भाव के सुरक्षित अंदरूनी हिस्से में रखें।
   const lineGap = items.length >= 5 ? 11 : (items.length >= 3 ? 13 : 15);
-  const firstY = y + 18;
+  const startY = y + 16;
   items.forEach((p,j)=>{
    const el=document.createElementNS("http://www.w3.org/2000/svg","text");
-   let labelY = firstY + j*lineGap;
-   // Bottom and top cells have less room near the frame; pull labels inward.
-   if (y >= 330) labelY = y - 25 + j*lineGap;
-   if (y <= 65) labelY = y + 17 + j*lineGap;
-   el.setAttribute("x",x);el.setAttribute("y",labelY);
-   el.setAttribute("class","planet");el.setAttribute("fill",p.color);
+   el.setAttribute("x",x);
+   el.setAttribute("y",startY+j*lineGap);
+   el.setAttribute("class","planet");
+   el.setAttribute("fill",p.color);
    el.textContent=p.short+" "+String(Math.floor(p.within)).padStart(2,"0")+"°";
    g.appendChild(el);
   });
