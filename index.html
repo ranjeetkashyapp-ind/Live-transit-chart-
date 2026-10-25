@@ -13,7 +13,7 @@ header{text-align:center;margin:0 auto 12px;max-width:600px}
 h2{font-size:19px;text-align:center;margin:5px 0 12px}
 #time{text-align:center;color:var(--muted);font-size:13px;margin:8px 0 14px}
 .dateControls{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;max-width:600px;margin:10px auto 14px;font-size:13px}.dateControls input,.dateControls select{font:inherit;padding:8px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
-#ampm{font-weight:bold;background:#fff0cf;color:#8a5100;border:2px solid #c98217}#ampm option[value="AM"]{background:#e5f2ff;color:#1457a6}#ampm option[value="PM"]{background:#ffe5ec;color:#a51e4b}
+#ampm{font-weight:bold;border:2px solid #c98217}#ampm:has(option:checked[value="AM"]){background:#e5f2ff;color:#2878D0;border-color:#2878D0}#ampm:has(option:checked[value="PM"]){background:#ffe5ec;color:#C65383;border-color:#C65383}#ampm option[value="AM"]{background:#e5f2ff;color:#2878D0}#ampm option[value="PM"]{background:#ffe5ec;color:#C65383}
 .planet{font-size:10px;font-weight:bold;text-anchor:middle;paint-order:stroke;stroke:#fff;stroke-width:1.4px;stroke-linejoin:round}
 .controls{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin:10px auto 14px}
 button,select{font-size:14px;padding:9px 14px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
@@ -21,7 +21,7 @@ button{background:#c98217;color:white;font-weight:bold;cursor:pointer}
 svg{display:block;width:100%;height:auto;max-width:600px;margin:auto}
 .frame{fill:none;stroke:var(--line);stroke-width:2}
 .house{font-size:15px;font-weight:bold;fill:#806c5b;text-anchor:middle}
-.planet{font-size:11px;font-weight:bold;text-anchor:middle}
+.planet{font-size:10px;font-weight:bold;text-anchor:middle;dominant-baseline:middle}
 #status{text-align:center;font-size:13px;color:var(--muted);margin:12px 0}
 .tableWrap{max-width:600px;margin:auto}
 table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
@@ -109,8 +109,19 @@ function makeData(now){
 }
 // केंद्र-बिंदु: उत्तर भारतीय कुंडली के 12 वास्तविक खानों में, राशि 1 से 12 के क्रम में।
 const positions=[
- [200,92], [105,145], [105,255], [105,322], [200,348], [295,322],
- [295,255], [295,145], [200,200], [295,92], [200,58], [105,92]
+ // 12 भावों के अंदरूनी केंद्र; हर बिंदु रेखाओं से दूर रखा गया है।
+ [200,92],   // 1: ऊपर बीच
+ [125,145],  // 2: ऊपर-बायाँ
+ [105,200],  // 3: बायाँ बीच
+ [125,270],  // 4: नीचे-बायाँ
+ [200,310],  // 5: नीचे बीच-बायाँ
+ [200,350],  // 6: सबसे नीचे
+ [275,310],  // 7: नीचे बीच-दायाँ
+ [315,270],  // 8: नीचे-दायाँ
+ [295,200],  // 9: दायाँ बीच
+ [275,145],  // 10: ऊपर-दायाँ
+ [200,55],   // 11: ऊपर का शीर्ष
+ [160,92]    // 12: ऊपर-बायाँ अंदर
 ];
 let dataCache=[];
 function render(){
@@ -128,13 +139,16 @@ function render(){
   const h=document.createElementNS("http://www.w3.org/2000/svg","text");
   h.setAttribute("x",x);h.setAttribute("y",y);h.setAttribute("class","house");
   h.textContent=String(signNo);g.appendChild(h);
-  // राशि नंबर ऊपर रखें और ग्रहों की सूची भाव के सुरक्षित अंदरूनी हिस्से में रखें।
+  // राशि अंक को भाव के ऊपरी हिस्से में रखें; ग्रहों को उसके नीचे स्टैक करें।
+  h.setAttribute("y",y-17);
+  // Keep each planet label in its own line within the same bhava.
+  // Tighten spacing only when a house contains several planets; never change chart geometry.
   const lineGap = items.length >= 5 ? 10 : (items.length >= 3 ? 12 : 14);
-  const startY = y + (items.length >= 4 ? 10 : 14);
+  const firstY = y + 2;
   items.forEach((p,j)=>{
    const el=document.createElementNS("http://www.w3.org/2000/svg","text");
    el.setAttribute("x",x);
-   el.setAttribute("y",startY+j*lineGap);
+   el.setAttribute("y",firstY+j*lineGap);
    el.setAttribute("class","planet");
    el.setAttribute("fill",p.color);
    el.textContent=p.short+" "+String(Math.floor(p.within)).padStart(2,"0")+"°";
