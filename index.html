@@ -12,6 +12,7 @@ header{text-align:center;margin:0 auto 12px;max-width:600px}
 .logoText{font-weight:700;font-size:22px;margin:4px 0;color:#b58120}
 h2{font-size:19px;text-align:center;margin:5px 0 12px}
 #time{text-align:center;color:var(--muted);font-size:13px;margin:8px 0 14px}
+.dateControls{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;max-width:600px;margin:10px auto 14px;font-size:13px}.dateControls input{font:inherit;padding:8px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
 .controls{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin:10px auto 14px}
 button,select{font-size:14px;padding:9px 14px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
 button{background:#c98217;color:white;font-weight:bold;cursor:pointer}
@@ -30,6 +31,11 @@ footer{text-align:center;margin:22px 0 8px;font-size:14px;color:#9b6b17;font-wei
 <body>
 <header><div class="logoText">Astro Plus</div><h2>Live- Transit- Chart</h2></header>
 <div id="time">गणना हो रही है…</div>
+<div class="dateControls" aria-label="तारीख और समय चुनें">
+  <label for="chartDate">तारीख</label><input id="chartDate" type="date">
+  <label for="chartTime">समय (IST)</label><input id="chartTime" type="time" step="60">
+  <button id="todayBtn" type="button">आज का समय</button>
+</div>
 <div class="controls">
   <button id="rotateBackBtn" type="button">← Rotate Left</button>
   <button id="rotateBtn" type="button">Rotate Right →</button>
@@ -137,23 +143,48 @@ function render(){
   `<tr><td style="color:${p.color};font-weight:bold">${p.name}</td><td>${signs[p.sign]}</td><td>${degText(p.within)}</td></tr>`
  ).join("");
 }
+function currentDelhiParts(){
+ const parts=new Intl.DateTimeFormat("en-CA",{
+  timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit",
+  hour:"2-digit",minute:"2-digit",hourCycle:"h23"
+ }).formatToParts(new Date());
+ const o={};parts.forEach(p=>o[p.type]=p.value);
+ return {date:`${o.year}-${o.month}-${o.day}`,time:`${o.hour}:${o.minute}`};
+}
+function selectedChartDate(){
+ const d=document.getElementById("chartDate").value;
+ const t=document.getElementById("chartTime").value;
+ if(!d||!t)return new Date();
+ // Convert Delhi IST (+05:30) explicitly, independent of the phone's timezone.
+ return new Date(`${d}T${t}:00+05:30`);
+}
 function calc(){
  if(!window.Astronomy){
   document.getElementById("status").textContent="गणना लाइब्रेरी लोड नहीं हुई। इंटरनेट जाँचकर पेज Refresh करें।";
   return;
  }
  try{
-  const now=new Date();
-  document.getElementById("time").textContent="दिल्ली समय: "+new Intl.DateTimeFormat("en-IN",{
+  const selected=selectedChartDate();
+  const label=new Intl.DateTimeFormat("en-IN",{
    timeZone:"Asia/Kolkata",dateStyle:"medium",timeStyle:"medium"
-  }).format(now);
-  dataCache=makeData(now);render();
-  document.getElementById("status").textContent="लाइव ग्रह-स्थिति · अनुमानित Lahiri अयनांश · दिल्ली";
+  }).format(selected);
+  document.getElementById("time").textContent="चुना हुआ दिल्ली समय: "+label;
+  dataCache=makeData(selected);render();
+  document.getElementById("status").textContent="चुनी हुई तारीख की ग्रह-स्थिति · अनुमानित Lahiri अयनांश · दिल्ली";
  }catch(e){
   document.getElementById("status").textContent="गणना में त्रुटि हुई। इंटरनेट जाँचें या पेज Refresh करें।";
   console.error(e);
  }
 }
+function setToday(){
+ const p=currentDelhiParts();
+ document.getElementById("chartDate").value=p.date;
+ document.getElementById("chartTime").value=p.time;
+ calc();
+}
+document.getElementById("chartDate").addEventListener("change",calc);
+document.getElementById("chartTime").addEventListener("change",calc);
+document.getElementById("todayBtn").addEventListener("click",setToday);
 document.getElementById("rotateBackBtn").addEventListener("click",()=>{
  const sel=document.getElementById("rotation");
  sel.value=String((Number(sel.value)+11)%12);render();
@@ -163,7 +194,13 @@ document.getElementById("rotateBtn").addEventListener("click",()=>{
  sel.value=String((Number(sel.value)+1)%12);render();
 });
 document.getElementById("rotation").addEventListener("change",render);
-calc();setInterval(calc,60000);
+setToday();
+setInterval(()=>{
+ const inputs=currentDelhiParts();
+ // Keep the current-time chart refreshed each minute; historical/future selections stay fixed.
+ if(document.getElementById("chartDate").value===inputs.date &&
+    document.getElementById("chartTime").value===inputs.time) setToday();
+},60000);
 </script>
 </body>
 </html>
