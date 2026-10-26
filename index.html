@@ -721,11 +721,8 @@ function calc(){
 
       const signNumber=((lagnaSign+house)%12)+1;
 
-      /* केवल छठे भाव को 40 पॉइंट अंदर किया गया है */
-      let inwardMove=0;
-
-      if(house===5) inwardMove=40; // छठा भाव
-      if(house===6) inwardMove=40; // सातवाँ भाव, पहले जैसा
+      // केवल सातवें भाव को 60 पॉइंट अंदर किया गया है
+      const inwardMove = house === 6 ? 60 : 0;
 
       const signX=xNew-(dx/distance)*inwardMove;
       const signY=yNew-(dy/distance)*inwardMove;
