@@ -32,8 +32,8 @@ th{color:var(--line)}
 .details-section h3{text-align:center;color:var(--line);font-size:18px;margin:0 0 12px}
 .sun-moon-times{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0 0 14px}
 .sun-moon-time{padding:9px;background:var(--bg);border-radius:7px;min-width:0}
-.sun-moon-time .detail-label{font-size:12px;color:var(--muted)}
-.sun-moon-time .detail-value{font-size:14px;font-weight:bold;margin-top:5px}
+.sun-moon-time .detail-label{font-size:12px;color:var(--muted);text-align:center;font-weight:600}
+.sun-moon-time .detail-value{font-size:14px;font-weight:bold;margin-top:5px;text-align:center}
 .details-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .detail-item{padding:10px;background:var(--bg);border-radius:7px;overflow-wrap:anywhere;min-width:0}
 .detail-label{color:var(--muted);font-size:12px}
@@ -67,7 +67,6 @@ th{color:var(--line)}
 <div id="status">ग्रहों की स्थिति लोड हो रही है…</div>
 <table><thead><tr><th>ग्रह</th><th>राशि</th><th>अंश</th><th>स्थिति</th></tr></thead><tbody id="rows"></tbody></table>
 <section class="details-section">
-<h3>सूर्योदय, सूर्यास्त और चन्द्रोदय, चन्द्रास्त</h3>
 <div class="sun-moon-times" aria-label="सूर्य और चंद्रमा के उदय-अस्त का समय">
 <div class="sun-moon-time"><div class="detail-label">सूर्योदय</div><div class="detail-value" id="sunriseTime">—</div></div>
 <div class="sun-moon-time"><div class="detail-label">सूर्यास्त</div><div class="detail-value" id="sunsetTime">—</div></div>
