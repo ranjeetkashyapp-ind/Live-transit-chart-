@@ -24,12 +24,8 @@ svg{display:block;width:100%;height:auto;max-width:600px;margin:auto}
 .house{font-size:12px;fill:var(--muted);text-anchor:middle}
 .planet{font-size:12px;font-weight:bold;text-anchor:middle}
 #status{text-align:center;font-size:13px;color:var(--muted);margin:12px 0}
-#rotation{text-align:center;margin:0 auto 8px}
-#rotation button{
-  padding:6px 18px;
-  margin:0 5px;
-  cursor:pointer;
-}
+#rotation{text-align:center;margin:0 0 8px}
+#rotation button{padding:6px 18px;margin:0 5px;cursor:pointer}
 table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
 th,td{text-align:left;padding:8px 4px;border-bottom:1px solid #e6d4bf}
 th{color:var(--line)}
@@ -50,7 +46,6 @@ th{color:var(--line)}
     M200 2L398 200L200 398L2 200Z"/>
   <g id="labels"></g>
 </svg>
-
 <div id="status">ग्रहों की स्थिति लोड हो रही है…</div>
 <table>
 <thead><tr><th>ग्रह</th><th>राशि</th><th>डिग्री</th></tr></thead>
@@ -74,6 +69,7 @@ const planets=[
 
 let rotation=0;
 
+// Lahiri ayanamsha approximate polynomial, degrees.
 function ayanamsha(date){
  const y=date.getUTCFullYear()+
  (date.getUTCMonth()+0.5)/12;
@@ -99,6 +95,7 @@ function calc(){
  }
  try{
   const now=new Date();
+  const date=new Date(now.toLocaleString("en-US",{timeZone:"Asia/Kolkata"}));
   document.getElementById("time").textContent=
    "दिल्ली समय: "+new Intl.DateTimeFormat("en-IN",{
     timeZone:"Asia/Kolkata",dateStyle:"medium",timeStyle:"medium"
@@ -110,6 +107,7 @@ function calc(){
    return {name,color,lon,sign:Math.floor(lon/30),within:lon%30};
   });
 
+  // Mean lunar node approximation
   const jd=now.getTime()/86400000+2440587.5;
   const T=(jd-2451545)/36525;
   const rahu=norm(125.04452-1934.136261*T+0.0020708*T*T+T*T*T/450000);
@@ -120,14 +118,14 @@ function calc(){
   data.push({name:"केतु",color:"#a05bc4",lon:klon,
    sign:Math.floor(klon/30),within:klon%30});
 
+  // Original chart geometry remains unchanged.
   const positions=[
    [200,55],[105,60],[45,120],[105,200],
    [45,285],[105,345],[200,345],[295,345],
    [355,285],[295,200],[355,120],[295,60]
   ];
 
-  // Rotation changes the sign/planet data assigned to each fixed chart cell.
-  // Left moves data to the previous cell; right moves it to the next cell.
+  // Rotation moves the complete sign/planet data between chart cells.
   const bySign=Array.from({length:12},()=>[]);
   data.forEach(p=>{
    const cell=norm(p.sign+rotation);
