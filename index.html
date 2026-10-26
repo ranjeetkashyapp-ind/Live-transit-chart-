@@ -321,12 +321,107 @@ th{color:var(--line)}
   </div>
 </section>
 
+<!-- नया सेक्शन: चंद्र राशि और नक्षत्र -->
+<section class="details-section">
+  <h3>चंद्र राशि एवं नक्षत्र विवरण</h3>
+  <div class="details-grid">
+    <div class="detail-item">
+      <div class="detail-label">चंद्र राशि</div>
+      <div class="detail-value" id="moonRashi">—</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">राशि स्वामी</div>
+      <div class="detail-value" id="moonRashiLord">—</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">चंद्रमा की डिग्री</div>
+      <div class="detail-value" id="moonDegree">—</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">जन्म नक्षत्र</div>
+      <div class="detail-value" id="birthNakshatra">—</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">नक्षत्र स्वामी</div>
+      <div class="detail-value" id="nakshatraLord">—</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">नक्षत्र चरण</div>
+      <div class="detail-value" id="nakshatraPada">—</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">चरण का नाम अक्षर</div>
+      <div class="detail-value" id="nakshatraAkshar">—</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">कुल चरण</div>
+      <div class="detail-value">4</div>
+    </div>
+  </div>
+</section>
+
+<!-- नया सेक्शन: अवकहड़ा चक्र -->
+<section class="details-section">
+  <h3>अवकहड़ा चक्र / Avakhada Chakra</h3>
+  <div class="details-grid">
+    <div class="detail-item">
+      <div class="detail-label">वर्ण</div>
+      <div class="detail-value" id="avVarna">—</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">वश्य</div>
+      <div class="detail-value" id="avVashya">—</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">योनि</div>
+      <div class="detail-value" id="avYoni">—</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">गण</div>
+      <div class="detail-value" id="avGana">—</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">नाड़ी</div>
+      <div class="detail-value" id="avNadi">—</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">राशि</div>
+      <div class="detail-value" id="avRashi">—</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">राशि स्वामी</div>
+      <div class="detail-value" id="avRashiLord">—</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">नक्षत्र</div>
+      <div class="detail-value" id="avNakshatra">—</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">नक्षत्र स्वामी</div>
+      <div class="detail-value" id="avNakshatraLord">—</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">चरण</div>
+      <div class="detail-value" id="avPada">—</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">नाम अक्षर</div>
+      <div class="detail-value" id="avAkshar">—</div>
+    </div>
+  </div>
+</section>
+
 <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
 
 <script>
 const signs=[
   "मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या",
   "तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"
+];
+
+const signLords=[
+  "मंगल","शुक्र","बुध","चंद्र","सूर्य","बुध",
+  "शुक्र","मंगल","गुरु","शनि","शनि","गुरु"
 ];
 
 const planets=[
@@ -371,6 +466,43 @@ const nakshatras=[
   "शतभिषा","पूर्वा भाद्रपद","उत्तरा भाद्रपद","रेवती"
 ];
 
+const nakshatraLords=[
+  "केतु","शुक्र","सूर्य","चंद्र","मंगल","राहु","गुरु","शनि","बुध",
+  "केतु","शुक्र","सूर्य","चंद्र","मंगल","राहु","गुरु","शनि","बुध",
+  "केतु","शुक्र","सूर्य","चंद्र","मंगल","राहु","गुरु","शनि","बुध"
+];
+
+// प्रत्येक नक्षत्र के चार चरणों के पारंपरिक नाम अक्षर
+const nakshatraSyllables=[
+  ["चू","चे","चो","ला"],
+  ["ली","लू","ले","लो"],
+  ["अ","ई","उ","ए"],
+  ["ओ","वा","वी","वू"],
+  ["वे","वो","का","की"],
+  ["कू","घ","ङ","छ"],
+  ["के","को","हा","ही"],
+  ["हू","हे","हो","डा"],
+  ["डी","डू","डे","डो"],
+  ["मा","मी","मू","मे"],
+  ["मो","टा","टी","टू"],
+  ["टे","टो","पा","पी"],
+  ["पू","ष","ण","ठ"],
+  ["पे","पो","रा","री"],
+  ["रू","रे","रो","ता"],
+  ["ती","तू","ते","तो"],
+  ["ना","नी","नू","ने"],
+  ["नो","या","यी","यू"],
+  ["ये","यो","भा","भी"],
+  ["भू","धा","फा","ढा"],
+  ["भे","भो","जा","जी"],
+  ["खी","खू","खे","खो"],
+  ["गा","गी","गू","गे"],
+  ["गो","सा","सी","सू"],
+  ["से","सो","दा","दी"],
+  ["दू","थ","झ","ञ"],
+  ["दे","दो","चा","ची"]
+];
+
 const yogas=[
   "विष्कुम्भ","प्रीति","आयुष्मान","सौभाग्य","शोभन",
   "अतिगण्ड","सुकर्मा","धृति","शूल","गण्ड",
@@ -383,6 +515,39 @@ const yogas=[
 const karanas=[
   "बव","बालव","कौलव","तैतिल","गर","वणिज","विष्टि"
 ];
+
+// नक्षत्र क्रम: योनि, गण, नाड़ी
+const nakshatraTraits=[
+  ["घोड़ा","देव","आदि"],
+  ["हाथी","मनुष्य","मध्य"],
+  ["भेड़","राक्षस","अन्त्य"],
+  ["सर्प","मनुष्य","अन्त्य"],
+  ["सर्प","देव","मध्य"],
+  ["कुत्ता","मनुष्य","आदि"],
+  ["बिल्ली","देव","आदि"],
+  ["भेड़","देव","मध्य"],
+  ["बिल्ली","राक्षस","अन्त्य"],
+  ["चूहा","राक्षस","अन्त्य"],
+  ["चूहा","मनुष्य","मध्य"],
+  ["गाय","मनुष्य","आदि"],
+  ["भैंस","देव","आदि"],
+  ["बाघ","राक्षस","मध्य"],
+  ["भैंस","देव","अन्त्य"],
+  ["बाघ","राक्षस","अन्त्य"],
+  ["हिरण","देव","मध्य"],
+  ["हिरण","राक्षस","आदि"],
+  ["कुत्ता","राक्षस","आदि"],
+  ["वानर","मनुष्य","मध्य"],
+  ["नेवला","मनुष्य","अन्त्य"],
+  ["वानर","देव","अन्त्य"],
+  ["सिंह","राक्षस","मध्य"],
+  ["घोड़ा","राक्षस","आदि"],
+  ["सिंह","मनुष्य","आदि"],
+  ["गाय","मनुष्य","मध्य"],
+  ["हाथी","देव","अन्त्य"]
+];
+
+const yogasNames=yogas;
 
 function getDelhiDateTime(){
   const parts=new Intl.DateTimeFormat("en-GB",{
@@ -521,6 +686,57 @@ function calculateLagna(date){
   return norm(tropical-ayanamsha(date));
 }
 
+// नया: चंद्र राशि, नक्षत्र, चरण और अवकहड़ा चक्र
+function updateMoonAndAvakhada(moonSidereal){
+  const moonSign=Math.floor(moonSidereal/30);
+  const moonDegree=moonSidereal%30;
+
+  const nakSize=360/27;
+  const padaSize=nakSize/4;
+  const nakIndex=Math.floor(moonSidereal/nakSize);
+  const withinNak=moonSidereal-(nakIndex*nakSize);
+  const pada=Math.min(4,Math.floor(withinNak/padaSize)+1);
+  const akshar=nakshatraSyllables[nakIndex][pada-1];
+  const traits=nakshatraTraits[nakIndex];
+
+  document.getElementById("moonRashi").textContent=signs[moonSign];
+  document.getElementById("moonRashiLord").textContent=signLords[moonSign];
+  document.getElementById("moonDegree").textContent=degText(moonDegree);
+
+  document.getElementById("birthNakshatra").textContent=nakshatras[nakIndex];
+  document.getElementById("nakshatraLord").textContent=nakshatraLords[nakIndex];
+  document.getElementById("nakshatraPada").textContent=`${pada} / 4`;
+  document.getElementById("nakshatraAkshar").textContent=akshar;
+
+  // अवकहड़ा चक्र के पारंपरिक गुण
+  // वर्ण वर्गीकरण राशि पर आधारित सामान्य पारंपरिक तालिका
+  const varnaBySign=[
+    "क्षत्रिय","वैश्य","शूद्र","ब्राह्मण",
+    "क्षत्रिय","वैश्य","शूद्र","ब्राह्मण",
+    "क्षत्रिय","वैश्य","शूद्र","ब्राह्मण"
+  ];
+
+  // वश्य का सामान्य राशि-आधारित वर्गीकरण
+  const vashyaBySign=[
+    "चतुष्पद","चतुष्पद","मानव",
+    "जलचर","वनचर","मानव",
+    "मानव","कीट","चतुष्पद",
+    "चतुष्पद","मानव","जलचर"
+  ];
+
+  document.getElementById("avVarna").textContent=varnaBySign[moonSign];
+  document.getElementById("avVashya").textContent=vashyaBySign[moonSign];
+  document.getElementById("avYoni").textContent=traits[0];
+  document.getElementById("avGana").textContent=traits[1];
+  document.getElementById("avNadi").textContent=traits[2];
+  document.getElementById("avRashi").textContent=signs[moonSign];
+  document.getElementById("avRashiLord").textContent=signLords[moonSign];
+  document.getElementById("avNakshatra").textContent=nakshatras[nakIndex];
+  document.getElementById("avNakshatraLord").textContent=nakshatraLords[nakIndex];
+  document.getElementById("avPada").textContent=`${pada} / 4`;
+  document.getElementById("avAkshar").textContent=akshar;
+}
+
 function updateBirthAndPanchang(date,lagnaSign,lagnaDegree){
   const dateOptions={
     timeZone:"Asia/Kolkata",
@@ -597,7 +813,7 @@ function updateBirthAndPanchang(date,lagnaSign,lagnaDegree){
   )%27;
 
   document.getElementById("pYoga").textContent=
-    yogas[yogaIndex];
+    yogasNames[yogaIndex];
 
   const karanaIndex=Math.floor(elongation/6)%60;
   let karanaName;
@@ -611,6 +827,9 @@ function updateBirthAndPanchang(date,lagnaSign,lagnaDegree){
   }
 
   document.getElementById("pKarana").textContent=karanaName;
+
+  // नई गणना को मौजूदा पंचांग अपडेट में जोड़ें
+  updateMoonAndAvakhada(moonSidereal);
 }
 
 function addSvgText(group,x,y,className,text,fill){
@@ -721,7 +940,7 @@ function calc(){
 
       const signNumber=((lagnaSign+house)%12)+1;
 
-      // केवल सातवें भाव को 60 पॉइंट अंदर किया गया है
+      // मौजूदा कुंडली की पोज़िशनिंग में कोई बदलाव नहीं
       const inwardMove = house === 6 ? 60 : 0;
 
       const signX=xNew-(dx/distance)*inwardMove;
