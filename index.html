@@ -65,7 +65,7 @@ const planets=[
  ["Saturn","शनि","#777064"]
 ];
 
-let rotation = 0;
+let rotation=0;
 
 function rotateChart(step){
  rotation=(rotation+step+12)%12;
@@ -119,25 +119,34 @@ function calc(){
   data.push({name:"केतु",color:"#a05bc4",lon:klon,
    sign:Math.floor(klon/30),within:klon%30});
 
-  // Chart is a clean North Indian diamond; planetary signs are shown
-  // in their sign cells. Ascendant requires a separate horizon calculation.
+  // Original chart positions unchanged
   const positions=[
    [200,55],[105,60],[45,120],[105,200],
    [45,285],[105,345],[200,345],[295,345],
    [355,285],[295,200],[355,120],[295,60]
   ];
+
   const bySign=Array.from({length:12},()=>[]);
-  data.forEach(p=>bySign[(p.sign+rotation+12)%12].push(p));
+
+  // Rotate planets and number labels together
+  data.forEach(p=>{
+   const cell=(p.sign+rotation+12)%12;
+   bySign[cell].push(p);
+  });
 
   const g=document.getElementById("labels");
   g.innerHTML="";
+
   for(let i=0;i<12;i++){
    const [x,y]=positions[i];
+
    const h=document.createElementNS("http://www.w3.org/2000/svg","text");
-   h.setAttribute("x",x);h.setAttribute("y",y);
+   h.setAttribute("x",x);
+   h.setAttribute("y",y);
    h.setAttribute("class","house");
-   h.textContent=String(i+1);
+   h.textContent=String(((i-rotation+12)%12)+1);
    g.appendChild(h);
+
    bySign[i].forEach((p,j)=>{
     const el=document.createElementNS("http://www.w3.org/2000/svg","text");
     el.setAttribute("x",x);
@@ -152,6 +161,7 @@ function calc(){
   document.getElementById("rows").innerHTML=data.map(p=>
    `<tr><td>${p.name}</td><td>${signs[p.sign]}</td><td>${degText(p.within)}</td></tr>`
   ).join("");
+
   document.getElementById("status").textContent=
    "ग्रहों की अनुमानित खगोलीय गणना · Lahiri ayanamsha";
  }catch(e){
