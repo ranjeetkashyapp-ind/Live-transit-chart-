@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="hi">
 <head>
@@ -721,9 +720,12 @@ function calc(){
 
       const signNumber=((lagnaSign+house)%12)+1;
 
-      /* केवल सातवें और आठवें भाव 35 यूनिट अंदर */
-      const isTargetHouse=(house===6 || house===7);
-      const inwardMove=isTargetHouse ? 35 : 0;
+      /* केवल छठे, सातवें और आठवें भाव की पोज़िशन बदली गई है */
+      let inwardMove=0;
+
+      if(house===5) inwardMove=35; // छठा भाव
+      if(house===6) inwardMove=40; // सातवाँ भाव
+      if(house===7) inwardMove=35; // आठवाँ भाव
 
       const signX=xNew-(dx/distance)*inwardMove;
       const signY=yNew-(dy/distance)*inwardMove;
