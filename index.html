@@ -269,7 +269,6 @@ th{color:var(--line)}
   <tbody id="rows"></tbody>
 </table>
 
-<!-- जन्म विवरण -->
 <section class="details-section">
   <h3>जन्म विवरण / Birth Details</h3>
   <div class="details-grid">
@@ -292,7 +291,6 @@ th{color:var(--line)}
   </div>
 </section>
 
-<!-- पंचांग विवरण -->
 <section class="details-section">
   <h3>पंचांग विवरण / Panchang Details</h3>
   <div class="details-grid">
@@ -716,7 +714,7 @@ function calc(){
       const dy=y-200;
       const distance=Math.sqrt(dx*dx+dy*dy);
 
-      /* सभी भावों की मूल पोज़िशन समान */
+      /* मूल पोज़िशन बाकी भावों के लिए समान */
       const move=24;
 
       const xNew=x+(dx/distance)*move;
@@ -724,9 +722,9 @@ function calc(){
 
       const signNumber=((lagnaSign+house)%12)+1;
 
-      /* केवल लग्न और सामने वाला सातवाँ भाव 30 यूनिट अंदर */
+      /* केवल पहला और सातवाँ भाव 40 यूनिट अंदर */
       const isTargetHouse=(house===0 || house===6);
-      const inwardMove=isTargetHouse ? 30 : 0;
+      const inwardMove=isTargetHouse ? 40 : 0;
 
       const signX=xNew-(dx/distance)*inwardMove;
       const signY=yNew-(dy/distance)*inwardMove;
