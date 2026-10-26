@@ -168,7 +168,7 @@ function calc(){
   if(house===0)addSvgText(g,signX,signY+12,"lagna-label","लग्न");
   /* ग्रह: हर पंक्ति में 2, अगली पंक्ति नीचे; मौजूदा 14px फ़ॉन्ट और SVG लेआउट जस का तस */
   const planetBaseY = signY + (house===0 ? 26 : 16);
-  const planetStepX = 19;
+  const planetStepX = 13;
   const planetStepY = 16;
   byHouse[house].forEach((p,j)=>{
     const row = Math.floor(j/2);
