@@ -198,6 +198,41 @@ th{color:var(--line)}
   margin-top:5px
 }
 
+/* केवल पंचांग, चंद्र राशि और अवकहड़ा सूची का लेआउट */
+.details-list{
+  display:flex;
+  flex-direction:column;
+  gap:0
+}
+
+.detail-line{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:baseline;
+  gap:5px;
+  padding:9px 2px;
+  border-bottom:1px solid #e6d4bf;
+  font-size:14px;
+  line-height:1.5;
+  overflow-wrap:anywhere
+}
+
+.detail-line:last-child{
+  border-bottom:none
+}
+
+.detail-line .detail-label{
+  color:var(--muted);
+  font-size:14px;
+  flex-shrink:0
+}
+
+.detail-line .detail-value{
+  font-size:14px;
+  font-weight:bold;
+  margin-top:0
+}
+
 @media(max-width:360px){
   .datetime-controls{gap:5px}
   .datetime-controls input{
@@ -269,6 +304,7 @@ th{color:var(--line)}
   <tbody id="rows"></tbody>
 </table>
 
+<!-- जन्म विवरण पहले जैसा -->
 <section class="details-section">
   <h3>जन्म विवरण / Birth Details</h3>
   <div class="details-grid">
@@ -291,123 +327,130 @@ th{color:var(--line)}
   </div>
 </section>
 
+<!-- पंचांग, चंद्र राशि और अवकहड़ा की संयुक्त सूची -->
 <section class="details-section">
-  <h3>पंचांग विवरण / Panchang Details</h3>
-  <div class="details-grid">
-    <div class="detail-item">
-      <div class="detail-label">वार</div>
-      <div class="detail-value" id="pWeekday">—</div>
-    </div>
-    <div class="detail-item">
-      <div class="detail-label">तिथि</div>
-      <div class="detail-value" id="pTithi">—</div>
-    </div>
-    <div class="detail-item">
-      <div class="detail-label">पक्ष</div>
-      <div class="detail-value" id="pPaksha">—</div>
-    </div>
-    <div class="detail-item">
-      <div class="detail-label">नक्षत्र</div>
-      <div class="detail-value" id="pNakshatra">—</div>
-    </div>
-    <div class="detail-item">
-      <div class="detail-label">योग</div>
-      <div class="detail-value" id="pYoga">—</div>
-    </div>
-    <div class="detail-item">
-      <div class="detail-label">करण</div>
-      <div class="detail-value" id="pKarana">—</div>
-    </div>
-  </div>
-</section>
+  <h3>पंचांग, चंद्र राशि एवं अवकहड़ा चक्र</h3>
 
-<!-- नया सेक्शन: चंद्र राशि और नक्षत्र -->
-<section class="details-section">
-  <h3>चंद्र राशि एवं नक्षत्र विवरण</h3>
-  <div class="details-grid">
-    <div class="detail-item">
-      <div class="detail-label">चंद्र राशि</div>
-      <div class="detail-value" id="moonRashi">—</div>
-    </div>
-    <div class="detail-item">
-      <div class="detail-label">राशि स्वामी</div>
-      <div class="detail-value" id="moonRashiLord">—</div>
-    </div>
-    <div class="detail-item">
-      <div class="detail-label">चंद्रमा की डिग्री</div>
-      <div class="detail-value" id="moonDegree">—</div>
-    </div>
-    <div class="detail-item">
-      <div class="detail-label">जन्म नक्षत्र</div>
-      <div class="detail-value" id="birthNakshatra">—</div>
-    </div>
-    <div class="detail-item">
-      <div class="detail-label">नक्षत्र स्वामी</div>
-      <div class="detail-value" id="nakshatraLord">—</div>
-    </div>
-    <div class="detail-item">
-      <div class="detail-label">नक्षत्र चरण</div>
-      <div class="detail-value" id="nakshatraPada">—</div>
-    </div>
-    <div class="detail-item">
-      <div class="detail-label">चरण का नाम अक्षर</div>
-      <div class="detail-value" id="nakshatraAkshar">—</div>
-    </div>
-    <div class="detail-item">
-      <div class="detail-label">कुल चरण</div>
-      <div class="detail-value">4</div>
-    </div>
-  </div>
-</section>
+  <div class="details-list">
 
-<!-- नया सेक्शन: अवकहड़ा चक्र -->
-<section class="details-section">
-  <h3>अवकहड़ा चक्र / Avakhada Chakra</h3>
-  <div class="details-grid">
-    <div class="detail-item">
-      <div class="detail-label">वर्ण</div>
-      <div class="detail-value" id="avVarna">—</div>
+    <div class="detail-line">
+      <span class="detail-label">लग्न राशि</span> -
+      <span class="detail-value" id="listLagna">—</span>
     </div>
-    <div class="detail-item">
-      <div class="detail-label">वश्य</div>
-      <div class="detail-value" id="avVashya">—</div>
+
+    <div class="detail-line">
+      <span class="detail-label">वार</span> -
+      <span class="detail-value" id="pWeekday">—</span>
     </div>
-    <div class="detail-item">
-      <div class="detail-label">योनि</div>
-      <div class="detail-value" id="avYoni">—</div>
+
+    <div class="detail-line">
+      <span class="detail-label">तिथि</span> -
+      <span class="detail-value" id="pTithi">—</span>
     </div>
-    <div class="detail-item">
-      <div class="detail-label">गण</div>
-      <div class="detail-value" id="avGana">—</div>
+
+    <div class="detail-line">
+      <span class="detail-label">पक्ष</span> -
+      <span class="detail-value" id="pPaksha">—</span>
     </div>
-    <div class="detail-item">
-      <div class="detail-label">नाड़ी</div>
-      <div class="detail-value" id="avNadi">—</div>
+
+    <div class="detail-line">
+      <span class="detail-label">नक्षत्र</span> -
+      <span class="detail-value" id="pNakshatra">—</span>
+      <span class="detail-value" id="listNakshatraPada">—</span>
     </div>
-    <div class="detail-item">
-      <div class="detail-label">राशि</div>
-      <div class="detail-value" id="avRashi">—</div>
+
+    <div class="detail-line">
+      <span class="detail-label">योग</span> -
+      <span class="detail-value" id="pYoga">—</span>
     </div>
-    <div class="detail-item">
-      <div class="detail-label">राशि स्वामी</div>
-      <div class="detail-value" id="avRashiLord">—</div>
+
+    <div class="detail-line">
+      <span class="detail-label">करण</span> -
+      <span class="detail-value" id="pKarana">—</span>
     </div>
-    <div class="detail-item">
-      <div class="detail-label">नक्षत्र</div>
-      <div class="detail-value" id="avNakshatra">—</div>
+
+    <div class="detail-line">
+      <span class="detail-label">चंद्र राशि</span> -
+      <span class="detail-value" id="moonRashi">—</span>
     </div>
-    <div class="detail-item">
-      <div class="detail-label">नक्षत्र स्वामी</div>
-      <div class="detail-value" id="avNakshatraLord">—</div>
+
+    <div class="detail-line">
+      <span class="detail-label">राशि स्वामी</span> -
+      <span class="detail-value" id="moonRashiLord">—</span>
     </div>
-    <div class="detail-item">
-      <div class="detail-label">चरण</div>
-      <div class="detail-value" id="avPada">—</div>
+
+    <div class="detail-line">
+      <span class="detail-label">चंद्रमा की डिग्री</span> -
+      <span class="detail-value" id="moonDegree">—</span>
     </div>
-    <div class="detail-item">
-      <div class="detail-label">नाम अक्षर</div>
-      <div class="detail-value" id="avAkshar">—</div>
+
+    <div class="detail-line">
+      <span class="detail-label">नक्षत्र स्वामी</span> -
+      <span class="detail-value" id="nakshatraLord">—</span>
     </div>
+
+    <div class="detail-line">
+      <span class="detail-label">वर्ण</span> -
+      <span class="detail-value" id="avVarna">—</span>
+    </div>
+
+    <div class="detail-line">
+      <span class="detail-label">वश्य</span> -
+      <span class="detail-value" id="avVashya">—</span>
+    </div>
+
+    <div class="detail-line">
+      <span class="detail-label">योनि</span> -
+      <span class="detail-value" id="avYoni">—</span>
+    </div>
+
+    <div class="detail-line">
+      <span class="detail-label">गण</span> -
+      <span class="detail-value" id="avGana">—</span>
+    </div>
+
+    <div class="detail-line">
+      <span class="detail-label">नाड़ी</span> -
+      <span class="detail-value" id="avNadi">—</span>
+    </div>
+
+    <div class="detail-line">
+      <span class="detail-label">अवकहड़ा राशि</span> -
+      <span class="detail-value" id="avRashi">—</span>
+    </div>
+
+    <div class="detail-line">
+      <span class="detail-label">अवकहड़ा राशि स्वामी</span> -
+      <span class="detail-value" id="avRashiLord">—</span>
+    </div>
+
+    <div class="detail-line">
+      <span class="detail-label">अवकहड़ा नक्षत्र</span> -
+      <span class="detail-value" id="avNakshatra">—</span>
+    </div>
+
+    <div class="detail-line">
+      <span class="detail-label">अवकहड़ा नक्षत्र स्वामी</span> -
+      <span class="detail-value" id="avNakshatraLord">—</span>
+    </div>
+
+    <div class="detail-line">
+      <span class="detail-label">चरण</span> -
+      <span class="detail-value" id="avPada">—</span>
+    </div>
+
+    <div class="detail-line">
+      <span class="detail-label">नाम अक्षर</span> -
+      <span class="detail-value" id="avAkshar">—</span>
+    </div>
+
+  </div>
+
+  <!-- मौजूदा JavaScript के पुराने IDs सुरक्षित रखने के लिए -->
+  <div hidden>
+    <span id="birthNakshatra">—</span>
+    <span id="nakshatraPada">—</span>
+    <span id="nakshatraAkshar">—</span>
   </div>
 </section>
 
@@ -686,7 +729,7 @@ function calculateLagna(date){
   return norm(tropical-ayanamsha(date));
 }
 
-// नया: चंद्र राशि, नक्षत्र, चरण और अवकहड़ा चक्र
+// चंद्र राशि, नक्षत्र, चरण और अवकहड़ा चक्र
 function updateMoonAndAvakhada(moonSidereal){
   const moonSign=Math.floor(moonSidereal/30);
   const moonDegree=moonSidereal%30;
@@ -708,15 +751,17 @@ function updateMoonAndAvakhada(moonSidereal){
   document.getElementById("nakshatraPada").textContent=`${pada} / 4`;
   document.getElementById("nakshatraAkshar").textContent=akshar;
 
+  // नक्षत्र के सामने चरण और अक्षर ब्रैकेट में
+  document.getElementById("listNakshatraPada").textContent=
+    `- चरण ${pada} (${akshar})`;
+
   // अवकहड़ा चक्र के पारंपरिक गुण
-  // वर्ण वर्गीकरण राशि पर आधारित सामान्य पारंपरिक तालिका
   const varnaBySign=[
     "क्षत्रिय","वैश्य","शूद्र","ब्राह्मण",
     "क्षत्रिय","वैश्य","शूद्र","ब्राह्मण",
     "क्षत्रिय","वैश्य","शूद्र","ब्राह्मण"
   ];
 
-  // वश्य का सामान्य राशि-आधारित वर्गीकरण
   const vashyaBySign=[
     "चतुष्पद","चतुष्पद","मानव",
     "जलचर","वनचर","मानव",
@@ -759,6 +804,10 @@ function updateBirthAndPanchang(date,lagnaSign,lagnaDegree){
     new Intl.DateTimeFormat("hi-IN",timeOptions).format(date);
 
   document.getElementById("birthLagna").textContent=
+    signs[lagnaSign]+" "+degText(lagnaDegree);
+
+  // सूची में सबसे ऊपर लग्न राशि
+  document.getElementById("listLagna").textContent=
     signs[lagnaSign]+" "+degText(lagnaDegree);
 
   const weekdayName=new Intl.DateTimeFormat("en-US",{
@@ -828,7 +877,6 @@ function updateBirthAndPanchang(date,lagnaSign,lagnaDegree){
 
   document.getElementById("pKarana").textContent=karanaName;
 
-  // नई गणना को मौजूदा पंचांग अपडेट में जोड़ें
   updateMoonAndAvakhada(moonSidereal);
 }
 
@@ -940,7 +988,7 @@ function calc(){
 
       const signNumber=((lagnaSign+house)%12)+1;
 
-      // मौजूदा कुंडली की पोज़िशनिंग में कोई बदलाव नहीं
+      // मूल कुंडली की पोज़िशनिंग में कोई बदलाव नहीं
       const inwardMove = house === 6 ? 60 : 0;
 
       const signX=xNew-(dx/distance)*inwardMove;
