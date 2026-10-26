@@ -25,6 +25,13 @@ svg{display:block;width:100%;height:auto;max-width:600px;margin:auto}
 .lagna-label{font-size:14px;fill:var(--line);text-anchor:middle;font-weight:bold}
 .planet{font-size:14px;font-weight:bold;text-anchor:middle}
 #status{text-align:center;font-size:13px;color:var(--muted);margin:12px 0}
+.kundli-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:14px 0 4px}
+.kundli-tab{background:#fffdf8;color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:10px 6px;font-size:13px;font-weight:bold;cursor:pointer;min-width:0}
+.kundli-tab.active{background:var(--line);color:#fff}
+.tab-panel[hidden]{display:none!important}
+.panel-note{font-size:12px;line-height:1.5;color:var(--muted);margin:12px 0 0}
+.prediction-content{font-size:14px;line-height:1.7}
+.prediction-content p{margin:8px 0}
 table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:13px;margin-top:12px}
 th,td{width:25%;text-align:left;padding:8px 4px;border-bottom:1px solid #e6d4bf;overflow-wrap:anywhere}
 th{color:var(--line)}
@@ -66,6 +73,12 @@ th{color:var(--line)}
 <g id="labels"></g></svg>
 <div id="status">ग्रहों की स्थिति लोड हो रही है…</div>
 <table><thead><tr><th>ग्रह</th><th>राशि</th><th>अंश</th><th>स्थिति</th></tr></thead><tbody id="rows"></tbody></table>
+<nav class="kundli-tabs" aria-label="कुंडली विवरण">
+<button type="button" class="kundli-tab active" data-panel="birth-panel">जन्म विवरण</button>
+<button type="button" class="kundli-tab" data-panel="dosha-panel">दोष</button>
+<button type="button" class="kundli-tab" data-panel="dasha-panel">ग्रहों की दशा</button>
+<button type="button" class="kundli-tab" data-panel="prediction-panel">Prediction</button>
+</nav>
 <section class="details-section">
 <div class="sun-moon-times">
 <div class="sun-moon-time"><div class="detail-label">सूर्योदय</div><div class="detail-value" id="sunriseTime">—</div></div>
@@ -74,6 +87,7 @@ th{color:var(--line)}
 <div class="sun-moon-time"><div class="detail-label">चन्द्रास्त</div><div class="detail-value" id="moonsetTime">—</div></div>
 </div>
 </section>
+<section id="birth-panel" class="tab-panel">
 <section class="details-section">
 <h3>जन्म विवरण / Birth Details</h3>
 <div class="details-grid">
@@ -106,6 +120,10 @@ th{color:var(--line)}
 <span id="avRashi">—</span><span id="avRashiLord">—</span><span id="avNakshatra">—</span><span id="avNakshatraLord">—</span><span id="avPada">—</span><span id="avAkshar">—</span>
 </div>
 </section>
+</section>
+<section id="dosha-panel" class="tab-panel" hidden><section class="details-section"><h3>दोष</h3><div class="details-list" id="doshaContent"><div class="detail-line"><span class="detail-label">स्थिति</span><span class="detail-value">गणना हो रही है…</span></div></div><p class="panel-note">दोष की गणना प्रचलित ज्योतिषीय नियमों पर आधारित संकेतात्मक आकलन है; अलग-अलग परंपराओं में नियम बदल सकते हैं।</p></section></section>
+<section id="dasha-panel" class="tab-panel" hidden><section class="details-section"><h3>विम्शोत्तरी दशा</h3><div class="details-list" id="dashaContent"><div class="detail-line"><span class="detail-label">दशा</span><span class="detail-value">गणना हो रही है…</span></div></div><p class="panel-note">यह गणना चुनी गई तारीख/समय को जन्म-समय मानकर की गई अनुमानित विम्शोत्तरी दशा है।</p></section></section>
+<section id="prediction-panel" class="tab-panel" hidden><section class="details-section"><h3>वर्तमान समय का फलादेश</h3><div id="predictionContent" class="prediction-content">गणना हो रही है…</div><p class="panel-note">यह सामान्य ज्योतिषीय व्याख्या है, निश्चित भविष्यवाणी नहीं।</p></section></section>
 <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
 <script>
 const signs=["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
@@ -219,6 +237,49 @@ function getPlanetStatus(p, now, sunSidereal) {
   return motion + " · उदय";
 }
 
+function setupKundliTabs(){
+ document.querySelectorAll(".kundli-tab").forEach(btn=>btn.addEventListener("click",()=>{
+  document.querySelectorAll(".kundli-tab").forEach(b=>b.classList.toggle("active",b===btn));
+  document.querySelectorAll(".tab-panel").forEach(panel=>panel.hidden=panel.id!==btn.dataset.panel);
+ }));
+}
+const dashaLords=["केतु","शुक्र","सूर्य","चंद्र","मंगल","राहु","गुरु","शनि","बुध"];
+const dashaYears={"केतु":7,"शुक्र":20,"सूर्य":6,"चंद्र":10,"मंगल":7,"राहु":18,"गुरु":16,"शनि":19,"बुध":17};
+const nakLordSequence=Array.from({length:27},(_,i)=>dashaLords[i%9]);
+function dashaAt(moonLon,date){
+ const span=360/27,nakIndex=Math.floor(moonLon/span),fraction=(moonLon%span)/span,firstLord=nakLordSequence[nakIndex],start=dashaLords.indexOf(firstLord);
+ const elapsed=fraction*dashaYears[firstLord],remaining=dashaYears[firstLord]-elapsed;
+ const startDate=new Date(date.getTime()-elapsed*365.2425*86400000);
+ let cursor=new Date(startDate),periods=[];
+ for(let i=0;i<18;i++){
+  const lord=dashaLords[(start+i)%9],years=dashaYears[lord],end=new Date(cursor.getTime()+years*365.2425*86400000);
+  periods.push({lord,start:new Date(cursor),end,years});cursor=end;
+ }
+ let maha=periods.find(x=>date>=x.start&&date<x.end)||periods[0];
+ if(!maha || (maha.lord===firstLord && date<maha.start)) maha={lord:firstLord,start:startDate,end:new Date(startDate.getTime()+dashaYears[firstLord]*365.2425*86400000)};
+ const mdIndex=dashaLords.indexOf(maha.lord),mdDuration=dashaYears[maha.lord],mdElapsed=Math.max(0,(date-maha.start)/(365.2425*86400000));
+ const adSequence=Array.from({length:9},(_,i)=>dashaLords[(mdIndex+i)%9]);let adCursor=new Date(maha.start),antar=null;
+ for(const lord of adSequence){const years=mdDuration*dashaYears[lord]/120, end=new Date(adCursor.getTime()+years*365.2425*86400000);if(date>=adCursor&&date<end){antar={lord,start:adCursor,end,years};break}adCursor=end;}
+ if(!antar) antar={lord:adSequence[0],start:maha.start,end:maha.end,years:mdDuration*dashaYears[adSequence[0]]/120};
+ const adIdx=dashaLords.indexOf(antar.lord),adDuration=antar.years,prSequence=Array.from({length:9},(_,i)=>dashaLords[(adIdx+i)%9]);let prCursor=new Date(antar.start),pratyantar=null;
+ for(const lord of prSequence){const years=adDuration*dashaYears[lord]/120,end=new Date(prCursor.getTime()+years*365.2425*86400000);if(date>=prCursor&&date<end){pratyantar={lord,start:prCursor,end};break}prCursor=end;}
+ if(!pratyantar)pratyantar={lord:prSequence[0],start:antar.start,end:antar.end};
+ return {maha,antar,pratyantar,firstLord,remaining};
+}
+function fmtDateShort(d){return new Intl.DateTimeFormat("hi-IN",{timeZone:"Asia/Kolkata",day:"2-digit",month:"short",year:"numeric"}).format(d)}
+function setLine(label,value){return `<div class="detail-line"><span class="detail-label">${label}</span><span class="detail-value">${value}</span></div>`}
+function updateInsightPanels(data,lagnaSign,now){
+ const mars=data.find(p=>p.name==="मंगल"),sun=data.find(p=>p.name==="सूर्य"),rahu=data.find(p=>p.name==="राहु"),moon=data.find(p=>p.name==="चंद्र"),ketu=data.find(p=>p.name==="केतु");
+ const housesFrom=(p,sign)=>((p.sign-sign+12)%12)+1, marsLagnaHouse=housesFrom(mars,lagnaSign),moonSign=moon.sign,marsMoonHouse=housesFrom(mars,moonSign),manglikHouses=[1,2,4,7,8,12],scores=(manglikHouses.includes(marsLagnaHouse)?50:0)+(manglikHouses.includes(marsMoonHouse)?50:0);
+ const sunRahuGap=Math.min((sun.lon-rahu.lon+360)%360,(rahu.lon-sun.lon+360)%360),ninthSign=(lagnaSign+8)%12,rahuNinth=rahu.sign===ninthSign,ketuNinth=ketu.sign===ninthSign;
+ const pitra=(sunRahuGap<=10||rahuNinth||ketuNinth);
+ const nakIndex=Math.floor(moon.lon/(360/27)),moola=nakIndex===18;
+ document.getElementById("doshaContent").innerHTML=setLine("मंगल दोष",`${scores}% (लग्न से भाव ${marsLagnaHouse}, चंद्र से भाव ${marsMoonHouse})`)+setLine("पितृ दोष",pitra?"संकेत मिलते हैं — विस्तृत कुंडली-जाँच आवश्यक":"प्रमुख संकेत नहीं मिले")+setLine("मूल / मूल नक्षत्र",moola?"चंद्रमा मूल नक्षत्र में है":"चंद्रमा मूल नक्षत्र में नहीं है");
+ const ds=dashaAt(moon.lon,now);document.getElementById("dashaContent").innerHTML=setLine("महादशा",`${ds.maha.lord} (${fmtDateShort(ds.maha.start)} – ${fmtDateShort(ds.maha.end)})`)+setLine("अंतर दशा",`${ds.antar.lord} (${fmtDateShort(ds.antar.start)} – ${fmtDateShort(ds.antar.end)})`)+setLine("प्रत्यंतर दशा",`${ds.pratyantar.lord} (${fmtDateShort(ds.pratyantar.start)} – ${fmtDateShort(ds.pratyantar.end)})`);
+ const sign=signs[moon.sign],lagna=signs[lagnaSign],marsText=scores?"ऊर्जा और जल्दबाज़ी पर ध्यान दें; महत्वपूर्ण निर्णय सोच-समझकर लें।":"कामों में धैर्य और नियमितता बनाए रखना लाभकारी रहेगा।";
+ const advice=[`इस समय की कुंडली में चंद्र राशि ${sign} और लग्न ${lagna} है।`,`कार्य: प्राथमिकताओं पर ध्यान दें और अधूरे काम पूरे करने की योजना बनाएँ।`,`संबंध: बातचीत स्पष्ट और शांत रखें; जल्द निष्कर्ष पर न पहुँचें.`,marsText,`ध्यान दें: यह चुने गए समय की सामान्य ज्योतिषीय व्याख्या है, व्यक्तिगत सलाह का विकल्प नहीं।`];
+ document.getElementById("predictionContent").innerHTML=advice.map(t=>`<p>${t}</p>`).join("");
+}
 function calc(){
  if(!window.Astronomy){document.getElementById("status").textContent="गणना लाइब्रेरी लोड नहीं हुई। इंटरनेट जाँचकर पेज Refresh करें।";return}
  try{
@@ -226,7 +287,7 @@ function calc(){
  const data=planets.map(([body,name,color])=>{const lon=siderealLongitude(Astronomy.Body[body],now);return {name,color,lon,sign:Math.floor(lon/30),within:lon%30}});
  const jd=now.getTime()/86400000+2440587.5,T=(jd-2451545)/36525,rahu=norm(125.04452-1934.136261*T+0.0020708*T*T+T*T*T/450000),rahuLon=norm(rahu-ayanamsha(now));
  data.push({name:"राहु",color:"#348c79",lon:rahuLon,sign:Math.floor(rahuLon/30),within:rahuLon%30});const ketuLon=norm(rahuLon+180);data.push({name:"केतु",color:"#a05bc4",lon:ketuLon,sign:Math.floor(ketuLon/30),within:ketuLon%30});
- const lagnaLon=calculateLagna(now),lagnaSign=Math.floor(lagnaLon/30),lagnaDegree=lagnaLon%30;updateSunMoonTimes(now);updateBirthAndPanchang(now,lagnaSign,lagnaDegree);
+ const lagnaLon=calculateLagna(now),lagnaSign=Math.floor(lagnaLon/30),lagnaDegree=lagnaLon%30;updateSunMoonTimes(now);updateBirthAndPanchang(now,lagnaSign,lagnaDegree);updateInsightPanels(data,lagnaSign,now);
  const byHouse=Array.from({length:12},()=>[]);data.forEach(p=>{const house=(p.sign-lagnaSign+12)%12;byHouse[house].push(p)});
  const g=document.getElementById("labels");g.innerHTML="";
  for(let house=0;house<12;house++){
@@ -255,7 +316,7 @@ function calc(){
  document.getElementById("status").textContent=`दिल्ली का लग्न: ${signs[lagnaSign]} ${degText(lagnaDegree)} · `+(selectedDateTime?"चुना हुआ समय":"लाइव कुंडली")+" · अनुमानित Lahiri ayanamsha";
  }catch(e){console.error(e);document.getElementById("status").textContent="गणना में त्रुटि हुई। इंटरनेट और गणना लाइब्रेरी जाँचें।"}
 }
-calc();setInterval(calc,60000);setInterval(updateLiveClock,1000);
+setupKundliTabs();calc();setInterval(calc,60000);setInterval(updateLiveClock,1000);
 </script>
 </body>
 </html>
