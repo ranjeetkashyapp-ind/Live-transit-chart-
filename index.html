@@ -71,31 +71,28 @@ th{color:var(--line)}
 <div class="detail-item"><div class="detail-label">लग्न राशि</div><div class="detail-value" id="birthLagna">—</div></div>
 </div></section>
 <section class="details-section">
-
 <div class="details-list">
 <div class="detail-line"><span class="detail-label">लग्न</span><span class="detail-value" id="listLagna">—</span></div>
-<div class="detail-line"><span class="detail-label">चंद्र राशि</span><span class="detail-value"><span id="moonRashi">—</span> <span id="moonDegree">—</span></span></div>
-<div class="detail-line"><span class="detail-label">नक्षत्र</span><span class="detail-value"><span id="pNakshatra">—</span><span id="listNakshatraPada"> —</span></span></div>
+<div class="detail-line"><span class="detail-label">राशि</span><span class="detail-value" id="moonRashi">—</span></div>
+<div class="detail-line"><span class="detail-label">राशि स्वामी</span><span class="detail-value" id="moonRashiLord">—</span></div>
+<div class="detail-line"><span class="detail-label">नक्षत्र</span><span class="detail-value"><span id="pNakshatra">—</span><span id="listNakshatraPada"></span></span></div>
+<div class="detail-line"><span class="detail-label">नक्षत्र स्वामी</span><span class="detail-value" id="nakshatraLord">—</span></div>
 <div class="detail-line"><span class="detail-label">तिथि</span><span class="detail-value" id="pTithi">—</span></div>
 <div class="detail-line"><span class="detail-label">वार</span><span class="detail-value" id="pWeekday">—</span></div>
 <div class="detail-line"><span class="detail-label">योग</span><span class="detail-value" id="pYoga">—</span></div>
 <div class="detail-line"><span class="detail-label">करण</span><span class="detail-value" id="pKarana">—</span></div>
 <div class="detail-line"><span class="detail-label">पक्ष</span><span class="detail-value" id="pPaksha">—</span></div>
-<div class="detail-line"><span class="detail-label">राशि स्वामी</span><span class="detail-value" id="moonRashiLord">—</span></div>
-<div class="detail-line"><span class="detail-label">नक्षत्र स्वामी</span><span class="detail-value" id="nakshatraLord">—</span></div>
 <div class="detail-line"><span class="detail-label">वर्ण</span><span class="detail-value" id="avVarna">—</span></div>
 <div class="detail-line"><span class="detail-label">वश्य</span><span class="detail-value" id="avVashya">—</span></div>
 <div class="detail-line"><span class="detail-label">योनि</span><span class="detail-value" id="avYoni">—</span></div>
 <div class="detail-line"><span class="detail-label">गण</span><span class="detail-value" id="avGana">—</span></div>
 <div class="detail-line"><span class="detail-label">नाड़ी</span><span class="detail-value" id="avNadi">—</span></div>
-<div class="detail-line"><span class="detail-label">राशि</span><span class="detail-value" id="avRashi">—</span></div>
-<div class="detail-line"><span class="detail-label">राशि स्वामी</span><span class="detail-value" id="avRashiLord">—</span></div>
-<div class="detail-line"><span class="detail-label">नक्षत्र</span><span class="detail-value" id="avNakshatra">—</span></div>
-<div class="detail-line"><span class="detail-label">नक्षत्र स्वामी</span><span class="detail-value" id="avNakshatraLord">—</span></div>
-<div class="detail-line"><span class="detail-label">चरण</span><span class="detail-value" id="avPada">—</span></div>
-<div class="detail-line"><span class="detail-label">नाम अक्षर</span><span class="detail-value" id="avAkshar">—</span></div>
-<div class="detail-line"><span class="detail-label">पाया</span><span class="detail-value" id="avPaya">—</span></div></div>
-<div hidden><span id="birthNakshatra">—</span><span id="nakshatraPada">—</span><span id="nakshatraAkshar">—</span></div>
+<div class="detail-line"><span class="detail-label">पाया</span><span class="detail-value" id="avPaya">—</span></div>
+</div>
+<div hidden>
+<span id="moonDegree">—</span><span id="birthNakshatra">—</span><span id="nakshatraPada">—</span><span id="nakshatraAkshar">—</span>
+<span id="avRashi">—</span><span id="avRashiLord">—</span><span id="avNakshatra">—</span><span id="avNakshatraLord">—</span><span id="avPada">—</span><span id="avAkshar">—</span>
+</div>
 </section>
 <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
 <script>
@@ -130,7 +127,7 @@ function updateMoonAndAvakhada(moonSidereal,lagnaSign){
  const moonSign=Math.floor(moonSidereal/30),moonDegree=moonSidereal%30,nakSize=360/27,padaSize=nakSize/4,nakIndex=Math.floor(moonSidereal/nakSize),withinNak=moonSidereal-(nakIndex*nakSize),pada=Math.min(4,Math.floor(withinNak/padaSize)+1),akshar=nakshatraSyllables[nakIndex][pada-1],traits=nakshatraTraits[nakIndex];
  document.getElementById("moonRashi").textContent=signs[moonSign];document.getElementById("moonRashiLord").textContent=signLords[moonSign];document.getElementById("moonDegree").textContent=degText(moonDegree);
  document.getElementById("birthNakshatra").textContent=nakshatras[nakIndex];document.getElementById("nakshatraLord").textContent=nakshatraLords[nakIndex];document.getElementById("nakshatraPada").textContent=`${pada} / 4`;document.getElementById("nakshatraAkshar").textContent=akshar;
- document.getElementById("listNakshatraPada").textContent=`— चरण ${pada} (${akshar})`;
+ document.getElementById("listNakshatraPada").textContent=` − चरण ${pada} − ${akshar}`;
  const varnaBySign=["क्षत्रिय","वैश्य","शूद्र","ब्राह्मण","क्षत्रिय","वैश्य","शूद्र","ब्राह्मण","क्षत्रिय","वैश्य","शूद्र","ब्राह्मण"];
  const vashyaBySign=["चतुष्पद","चतुष्पद","मानव","जलचर","वनचर","मानव","मानव","कीट","चतुष्पद","चतुष्पद","मानव","जलचर"];
  document.getElementById("avVarna").textContent=varnaBySign[moonSign];document.getElementById("avVashya").textContent=vashyaBySign[moonSign];document.getElementById("avYoni").textContent=traits[0];document.getElementById("avGana").textContent=traits[1];document.getElementById("avNadi").textContent=traits[2];document.getElementById("avRashi").textContent=signs[moonSign];document.getElementById("avRashiLord").textContent=signLords[moonSign];document.getElementById("avNakshatra").textContent=nakshatras[nakIndex];document.getElementById("avNakshatraLord").textContent=nakshatraLords[nakIndex];document.getElementById("avPada").textContent=`${pada} / 4`;document.getElementById("avAkshar").textContent=akshar;
