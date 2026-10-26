@@ -388,16 +388,27 @@ function calc(){
    const target=(house+rotationOffset+12)%12;
    const [x,y]=positions[target];
 
+   // राशि और ग्रहों को 8 पिक्सेल हल्का बाहर की ओर करें
+   const dx=x-200;
+   const dy=y-200;
+   const distance=Math.sqrt(dx*dx+dy*dy);
+   const move=8;
+
+   const xNew=x+(dx/distance)*move;
+   const yNew=y+(dy/distance)*move;
+
    const signNumber=((lagnaSign+house)%12)+1;
-   addSvgText(g,x,y,"house",String(signNumber));
+   addSvgText(g,xNew,yNew,"house",String(signNumber));
 
    if(house===0){
-    addSvgText(g,x,y+12,"lagna-label","लग्न");
+    addSvgText(g,xNew,yNew+12,"lagna-label","लग्न");
    }
 
    byHouse[house].forEach((p,j)=>{
-    const startY=y+(house===0?26:16);
-    addSvgText(g,x,startY+j*14,"planet",p.name,p.color);
+    const startY=yNew+(house===0?26:16);
+    addSvgText(
+     g,xNew,startY+j*14,"planet",p.name,p.color
+    );
    });
   }
 
@@ -418,8 +429,6 @@ function calc(){
 }
 
 calc();
-
-// कुंडली की गणना हर मिनट; घड़ी का समय हर सेकंड अपडेट
 setInterval(calc,60000);
 setInterval(updateLiveClock,1000);
 </script>
