@@ -100,14 +100,12 @@ th{color:var(--line)}
 <h2>Live Vedic Kundli</h2>
 <div id="time">गणना हो रही है…</div>
 
-<!-- Live Now: Date/Time ke upar, centre mein -->
 <div class="live-now-row">
   <button type="button" class="apply-btn" id="liveNow">
     Live Now
   </button>
 </div>
 
-<!-- Date, Time aur Apply ek hi line mein -->
 <div class="datetime-controls">
   <label>
     Date / तारीख
@@ -122,7 +120,6 @@ th{color:var(--line)}
   </button>
 </div>
 
-<!-- Rotation buttons -->
 <div class="rotate-controls">
   <button type="button" class="rotate-btn" id="leftRotate">
     ← Left Rotate
@@ -166,7 +163,6 @@ const planets=[
  ["Saturn","शनि","#777064"]
 ];
 
-// दिल्ली के लगभग निर्देशांक
 const DELHI_LAT = 28.6139;
 const DELHI_LON = 77.2090;
 
@@ -201,6 +197,19 @@ function setDateTimeInputs(){
  document.getElementById("chartTime").value=dt.time;
 }
 
+function updateLiveClock(){
+ if(selectedDateTime !== null) return;
+
+ const now = new Date();
+ document.getElementById("time").textContent =
+  "कुंडली समय (दिल्ली): " +
+  new Intl.DateTimeFormat("en-IN",{
+   timeZone:"Asia/Kolkata",
+   dateStyle:"medium",
+   timeStyle:"medium"
+  }).format(now);
+}
+
 setDateTimeInputs();
 
 document.getElementById("leftRotate").addEventListener("click",()=>{
@@ -223,7 +232,6 @@ document.getElementById("applyDateTime").addEventListener("click",()=>{
   return;
  }
 
- // चयनित समय को भारतीय समय (UTC+05:30) माना जाएगा।
  const chosen=new Date(`${dateValue}T${timeValue}:00+05:30`);
 
  if(Number.isNaN(chosen.getTime())){
@@ -242,7 +250,6 @@ document.getElementById("liveNow").addEventListener("click",()=>{
  calc();
 });
 
-// लगभग Lahiri ayanamsha, डिग्री में
 function ayanamsha(date){
  const y=date.getUTCFullYear()+
   (date.getUTCMonth()+0.5)/12;
@@ -266,7 +273,6 @@ function siderealLongitude(body,date){
  return norm(Astronomy.Ecliptic(v).elon-ayanamsha(date));
 }
 
-// Tropical Ascendant, फिर Lahiri ayanamsha घटाकर sidereal लग्न
 function calculateLagna(date){
  const jd=date.getTime()/86400000+2440587.5;
  const T=(jd-2451545.0)/36525;
@@ -322,7 +328,6 @@ function calc(){
  }
 
  try{
-  // Default: live current time. Apply करने पर selected time स्थिर रहेगा।
   const now=selectedDateTime || new Date();
   const ay=ayanamsha(now);
 
@@ -343,7 +348,6 @@ function calc(){
    };
   });
 
-  // Mean lunar node approximation
   const jd=now.getTime()/86400000+2440587.5;
   const T=(jd-2451545)/36525;
 
@@ -393,9 +397,7 @@ function calc(){
 
    byHouse[house].forEach((p,j)=>{
     const startY=y+(house===0?26:16);
-    addSvgText(
-     g,x,startY+j*14,"planet",p.name,p.color
-    );
+    addSvgText(g,x,startY+j*14,"planet",p.name,p.color);
    });
   }
 
@@ -416,7 +418,10 @@ function calc(){
 }
 
 calc();
+
+// कुंडली की गणना हर मिनट; घड़ी का समय हर सेकंड अपडेट
 setInterval(calc,60000);
+setInterval(updateLiveClock,1000);
 </script>
 </body>
 </html>
