@@ -25,24 +25,34 @@ h2{font-size:20px;text-align:center;margin:6px 0}
   font-size:13px;margin:8px 0 16px
 }
 .datetime-controls{
-  display:flex;justify-content:center;align-items:center;
-  flex-wrap:wrap;gap:10px;margin:0 auto 12px;
+  display:flex;justify-content:center;align-items:flex-end;
+  flex-wrap:nowrap;gap:10px;margin:0 auto 12px;
 }
 .datetime-controls label{
   display:flex;flex-direction:column;gap:5px;
   color:var(--muted);font-size:12px;
+  flex:1;min-width:0;
 }
 .datetime-controls input{
+  width:100%;min-width:0;
   background:#fff8ed;color:#392514;
   border:1px solid #a85d2b;border-radius:6px;
-  padding:8px;font-family:Arial,sans-serif;
-  font-size:14px;max-width:100%;min-width:0;
+  padding:8px 4px;font-family:Arial,sans-serif;
+  font-size:14px;
 }
 .apply-btn,.rotate-btn{
   background:#fff8ed;color:#392514;
   border:1px solid #a85d2b;border-radius:6px;
   padding:9px 14px;font-size:14px;
   font-weight:bold;cursor:pointer;
+}
+#liveNow{
+  display:inline-block;
+  margin:0 auto 10px;
+}
+.live-now-row{
+  text-align:center;
+  margin:0 auto;
 }
 .rotate-controls{
   display:flex;justify-content:center;
@@ -78,6 +88,11 @@ th,td{
   border-bottom:1px solid #e6d4bf
 }
 th{color:var(--line)}
+@media(max-width:360px){
+  .datetime-controls{gap:5px}
+  .datetime-controls input{font-size:12px;padding:8px 2px}
+  .apply-btn{padding:9px 10px;font-size:13px}
+}
 </style>
 </head>
 
@@ -85,6 +100,14 @@ th{color:var(--line)}
 <h2>Live Vedic Kundli</h2>
 <div id="time">गणना हो रही है…</div>
 
+<!-- Live Now: Date/Time ke upar, centre mein -->
+<div class="live-now-row">
+  <button type="button" class="apply-btn" id="liveNow">
+    Live Now
+  </button>
+</div>
+
+<!-- Date, Time aur Apply ek hi line mein -->
 <div class="datetime-controls">
   <label>
     Date / तारीख
@@ -97,11 +120,9 @@ th{color:var(--line)}
   <button type="button" class="apply-btn" id="applyDateTime">
     Apply
   </button>
-  <button type="button" class="apply-btn" id="liveNow">
-    Live Now
-  </button>
 </div>
 
+<!-- Rotation buttons -->
 <div class="rotate-controls">
   <button type="button" class="rotate-btn" id="leftRotate">
     ← Left Rotate
@@ -270,7 +291,6 @@ function calculateLagna(date){
  const e=eps*Math.PI/180;
  const phi=DELHI_LAT*Math.PI/180;
 
- // atan2 से कोण का सही quadrant निकाला जाता है।
  const tropical=norm(
   Math.atan2(
    Math.cos(theta),
@@ -346,12 +366,10 @@ function calc(){
    sign:Math.floor(ketuLon/30),within:ketuLon%30
   });
 
-  // लग्न राशि और लग्न का भाव
   const lagnaLon=calculateLagna(now);
   const lagnaSign=Math.floor(lagnaLon/30);
   const lagnaDegree=lagnaLon%30;
 
-  // ग्रहों को राशि के बजाय लग्न से गिने गए भाव में रखें।
   const byHouse=Array.from({length:12},()=>[]);
 
   data.forEach(p=>{
@@ -366,12 +384,9 @@ function calc(){
    const target=(house+rotationOffset+12)%12;
    const [x,y]=positions[target];
 
-   // North Indian chart में नंबर राशि को दिखाता है।
    const signNumber=((lagnaSign+house)%12)+1;
-
    addSvgText(g,x,y,"house",String(signNumber));
 
-   // लग्न भाव पर लग्न का छोटा निशान
    if(house===0){
     addSvgText(g,x,y+12,"lagna-label","लग्न");
    }
