@@ -736,17 +736,20 @@ function calc(){
       const dy=y-200;
       const distance=Math.sqrt(dx*dx+dy*dy);
 
-      /* मूल राशि और ग्रह पोज़िशन */
+      /* बाकी सभी भावों की मूल पोज़िशन समान */
       const move=24;
 
       const xNew=x+(dx/distance)*move;
       const yNew=y+(dy/distance)*move;
 
-      /* राशि नंबर को 15 यूनिट केंद्र की तरफ खिसाएँ */
-      const signX=xNew-(dx/distance)*15;
-      const signY=yNew-(dy/distance)*15;
-
       const signNumber=((lagnaSign+house)%12)+1;
+
+      /* केवल पहला और सातवाँ भाव अंदर */
+      const isTargetHouse=(house===0 || house===6);
+      const inwardMove=isTargetHouse ? 15 : 0;
+
+      const signX=xNew-(dx/distance)*inwardMove;
+      const signY=yNew-(dy/distance)*inwardMove;
 
       addSvgText(g,signX,signY,"house",String(signNumber));
 
@@ -754,10 +757,10 @@ function calc(){
         addSvgText(g,xNew,yNew+12,"lagna-label","लग्न");
       }
 
-      /* ग्रहों को 15 यूनिट केंद्र की तरफ खिसाएँ */
+      /* ग्रह केवल पहले और सातवें भाव में अंदर */
       byHouse[house].forEach((p,j)=>{
-        const planetX=xNew-(dx/distance)*15;
-        const planetY=yNew-(dy/distance)*15;
+        const planetX=xNew-(dx/distance)*inwardMove;
+        const planetY=yNew-(dy/distance)*inwardMove;
         const startY=planetY+(house===0?26:16);
 
         addSvgText(
