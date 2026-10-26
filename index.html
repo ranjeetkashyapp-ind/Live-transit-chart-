@@ -759,7 +759,7 @@ function calc(){
       const dy=y-200;
       const distance=Math.sqrt(dx*dx+dy*dy);
 
-      /* राशियों और ग्रहों की मूल पोज़िशन */
+      /* राशियों की मूल पोज़िशन समान */
       const move=24;
 
       const xNew=x+(dx/distance)*move;
@@ -773,10 +773,10 @@ function calc(){
         addSvgText(g,xNew,yNew+12,"lagna-label","लग्न");
       }
 
-      /* केवल ग्रहों को केंद्र की तरफ खिसाया गया है */
+      /* केवल ग्रहों को केंद्र की तरफ थोड़ा और खिसाया गया है */
       byHouse[house].forEach((p,j)=>{
-        const planetX=xNew-(dx/distance)*10;
-        const planetY=yNew-(dy/distance)*10;
+        const planetX=xNew-(dx/distance)*15;
+        const planetY=yNew-(dy/distance)*15;
         const startY=planetY+(house===0?26:16);
 
         addSvgText(
