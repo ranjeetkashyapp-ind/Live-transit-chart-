@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Live Vedic Kundli</title>
+
 <style>
 :root {
   --bg:#fff8ed;
@@ -19,82 +20,71 @@ body{
   font-family:Arial,sans-serif;
 }
 h2{font-size:20px;text-align:center;margin:6px 0}
-#time{text-align:center;color:var(--muted);font-size:13px;margin:8px 0 16px}
-
-/* Date and time controls */
+#time{
+  text-align:center;color:var(--muted);
+  font-size:13px;margin:8px 0 16px
+}
 .datetime-controls{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  flex-wrap:wrap;
-  gap:10px;
-  margin:0 auto 12px;
+  display:flex;justify-content:center;align-items:center;
+  flex-wrap:wrap;gap:10px;margin:0 auto 12px;
 }
 .datetime-controls label{
-  display:flex;
-  flex-direction:column;
-  gap:5px;
-  color:var(--muted);
-  font-size:12px;
+  display:flex;flex-direction:column;gap:5px;
+  color:var(--muted);font-size:12px;
 }
 .datetime-controls input{
-  background:#fff8ed;
-  color:#392514;
-  border:1px solid #a85d2b;
-  border-radius:6px;
-  padding:8px;
-  font-family:Arial,sans-serif;
-  font-size:14px;
-  max-width:100%;
-  min-width:0;
+  background:#fff8ed;color:#392514;
+  border:1px solid #a85d2b;border-radius:6px;
+  padding:8px;font-family:Arial,sans-serif;
+  font-size:14px;max-width:100%;min-width:0;
 }
-.apply-btn{
-  background:#fff8ed;
-  color:#392514;
-  border:1px solid #a85d2b;
-  border-radius:6px;
-  padding:9px 14px;
-  font-size:14px;
-  font-weight:bold;
-  cursor:pointer;
+.apply-btn,.rotate-btn{
+  background:#fff8ed;color:#392514;
+  border:1px solid #a85d2b;border-radius:6px;
+  padding:9px 14px;font-size:14px;
+  font-weight:bold;cursor:pointer;
 }
-
 .rotate-controls{
-  display:flex;
-  justify-content:center;
-  gap:12px;
-  margin:0 auto 12px;
+  display:flex;justify-content:center;
+  flex-wrap:wrap;gap:12px;margin:0 auto 12px;
 }
-.rotate-btn{
-  background:#fff8ed;
-  color:#392514;
-  border:1px solid #a85d2b;
-  border-radius:6px;
-  padding:9px 16px;
-  font-size:14px;
-  font-weight:bold;
-  cursor:pointer;
-}
+.rotate-btn{padding:9px 16px}
 .rotate-btn:active,.apply-btn:active{
   background:#f0dfca;
 }
-
-svg{display:block;width:100%;height:auto;max-width:600px;margin:auto}
+svg{
+  display:block;width:100%;height:auto;
+  max-width:600px;margin:auto
+}
 .frame{fill:none;stroke:var(--line);stroke-width:1.5}
-.house{font-size:12px;fill:var(--muted);text-anchor:middle}
+.house{
+  font-size:12px;fill:var(--muted);text-anchor:middle
+}
+.lagna-label{
+  font-size:10px;fill:var(--line);
+  text-anchor:middle;font-weight:bold
+}
 .planet{font-size:12px;font-weight:bold;text-anchor:middle}
-#status{text-align:center;font-size:13px;color:var(--muted);margin:12px 0}
-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
-th,td{text-align:left;padding:8px 4px;border-bottom:1px solid #e6d4bf}
+#status{
+  text-align:center;font-size:13px;
+  color:var(--muted);margin:12px 0
+}
+table{
+  width:100%;border-collapse:collapse;
+  font-size:13px;margin-top:12px
+}
+th,td{
+  text-align:left;padding:8px 4px;
+  border-bottom:1px solid #e6d4bf
+}
 th{color:var(--line)}
 </style>
 </head>
-<body>
 
+<body>
 <h2>Live Vedic Kundli</h2>
 <div id="time">गणना हो रही है…</div>
 
-<!-- Calendar and time controls -->
 <div class="datetime-controls">
   <label>
     Date / तारीख
@@ -107,9 +97,11 @@ th{color:var(--line)}
   <button type="button" class="apply-btn" id="applyDateTime">
     Apply
   </button>
+  <button type="button" class="apply-btn" id="liveNow">
+    Live Now
+  </button>
 </div>
 
-<!-- Rotation buttons -->
 <div class="rotate-controls">
   <button type="button" class="rotate-btn" id="leftRotate">
     ← Left Rotate
@@ -119,7 +111,7 @@ th{color:var(--line)}
   </button>
 </div>
 
-<svg id="chart" viewBox="0 0 400 400" aria-label="उत्तर भारतीय कुंडली">
+<svg id="chart" viewBox="0 0 400 400" aria-label="दिल्ली की लग्न कुंडली">
   <rect class="frame" x="2" y="2" width="396" height="396"/>
   <path class="frame" d="M2 2L398 398 M398 2L2 398
     M200 2L398 200L200 398L2 200Z"/>
@@ -129,14 +121,19 @@ th{color:var(--line)}
 <div id="status">ग्रहों की स्थिति लोड हो रही है…</div>
 
 <table>
-<thead><tr><th>ग्रह</th><th>राशि</th><th>डिग्री</th></tr></thead>
+<thead>
+<tr><th>ग्रह</th><th>राशि</th><th>डिग्री</th></tr>
+</thead>
 <tbody id="rows"></tbody>
 </table>
 
 <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
+
 <script>
-const signs=["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या",
-"तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
+const signs=[
+ "मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या",
+ "तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"
+];
 
 const planets=[
  ["Sun","सूर्य","#c17b16"],
@@ -148,6 +145,10 @@ const planets=[
  ["Saturn","शनि","#777064"]
 ];
 
+// दिल्ली के लगभग निर्देशांक
+const DELHI_LAT = 28.6139;
+const DELHI_LON = 77.2090;
+
 let rotationOffset = 0;
 let selectedDateTime = null;
 
@@ -157,20 +158,15 @@ const positions=[
  [355,285],[295,200],[355,120],[295,60]
 ];
 
-// Set the initial date and time to Delhi's current time.
 function getDelhiDateTime(){
  const parts=new Intl.DateTimeFormat("en-GB",{
   timeZone:"Asia/Kolkata",
-  year:"numeric",
-  month:"2-digit",
-  day:"2-digit",
-  hour:"2-digit",
-  minute:"2-digit",
-  hourCycle:"h23"
+  year:"numeric",month:"2-digit",day:"2-digit",
+  hour:"2-digit",minute:"2-digit",hourCycle:"h23"
  }).formatToParts(new Date());
 
  const v={};
- parts.forEach(p=>{v[p.type]=p.value});
+ parts.forEach(p=>v[p.type]=p.value);
 
  return {
   date:`${v.year}-${v.month}-${v.day}`,
@@ -178,11 +174,14 @@ function getDelhiDateTime(){
  };
 }
 
-const initialDateTime=getDelhiDateTime();
-document.getElementById("chartDate").value=initialDateTime.date;
-document.getElementById("chartTime").value=initialDateTime.time;
+function setDateTimeInputs(){
+ const dt=getDelhiDateTime();
+ document.getElementById("chartDate").value=dt.date;
+ document.getElementById("chartTime").value=dt.time;
+}
 
-// Only the rotation direction is reversed.
+setDateTimeInputs();
+
 document.getElementById("leftRotate").addEventListener("click",()=>{
  rotationOffset=(rotationOffset+1)%12;
  calc();
@@ -193,7 +192,6 @@ document.getElementById("rightRotate").addEventListener("click",()=>{
  calc();
 });
 
-// Apply the selected date and time to the chart.
 document.getElementById("applyDateTime").addEventListener("click",()=>{
  const dateValue=document.getElementById("chartDate").value;
  const timeValue=document.getElementById("chartTime").value;
@@ -204,7 +202,7 @@ document.getElementById("applyDateTime").addEventListener("click",()=>{
   return;
  }
 
- // Interpret the selected time as India Standard Time (UTC+05:30).
+ // चयनित समय को भारतीय समय (UTC+05:30) माना जाएगा।
  const chosen=new Date(`${dateValue}T${timeValue}:00+05:30`);
 
  if(Number.isNaN(chosen.getTime())){
@@ -217,18 +215,27 @@ document.getElementById("applyDateTime").addEventListener("click",()=>{
  calc();
 });
 
-// Lahiri ayanamsha approximate polynomial, degrees.
+document.getElementById("liveNow").addEventListener("click",()=>{
+ selectedDateTime=null;
+ setDateTimeInputs();
+ calc();
+});
+
+// लगभग Lahiri ayanamsha, डिग्री में
 function ayanamsha(date){
  const y=date.getUTCFullYear()+
- (date.getUTCMonth()+0.5)/12;
+  (date.getUTCMonth()+0.5)/12;
  const t=(y-2000)/100;
  return 23.853055+1.3969713*t+0.0003086*t*t;
 }
 
-function norm(x){return ((x%360)+360)%360}
+function norm(x){
+ return ((x%360)+360)%360;
+}
 
 function degText(x){
- const d=Math.floor(x),m=Math.floor((x-d)*60);
+ const d=Math.floor(x);
+ const m=Math.floor((x-d)*60);
  const s=Math.floor((((x-d)*60)-m)*60);
  return `${d}° ${m}' ${s}"`;
 }
@@ -236,6 +243,55 @@ function degText(x){
 function siderealLongitude(body,date){
  const v=Astronomy.GeoVector(body,date,true);
  return norm(Astronomy.Ecliptic(v).elon-ayanamsha(date));
+}
+
+// Tropical Ascendant, फिर Lahiri ayanamsha घटाकर sidereal लग्न
+function calculateLagna(date){
+ const jd=date.getTime()/86400000+2440587.5;
+ const T=(jd-2451545.0)/36525;
+
+ const gmst=norm(
+  280.46061837+
+  360.98564736629*(jd-2451545.0)+
+  0.000387933*T*T-
+  T*T*T/38710000
+ );
+
+ const lst=norm(gmst+DELHI_LON);
+
+ const eps=(
+  23.439291-
+  0.0130042*T-
+  0.000000164*T*T+
+  0.000000504*T*T*T
+ );
+
+ const theta=lst*Math.PI/180;
+ const e=eps*Math.PI/180;
+ const phi=DELHI_LAT*Math.PI/180;
+
+ // atan2 से कोण का सही quadrant निकाला जाता है।
+ const tropical=norm(
+  Math.atan2(
+   Math.cos(theta),
+   -(Math.sin(e)*Math.tan(phi)+Math.cos(e)*Math.sin(theta))
+  )*180/Math.PI
+ );
+
+ return norm(tropical-ayanamsha(date));
+}
+
+function addSvgText(group,x,y,className,text,fill){
+ const el=document.createElementNS(
+  "http://www.w3.org/2000/svg","text"
+ );
+ el.setAttribute("x",x);
+ el.setAttribute("y",y);
+ el.setAttribute("class",className);
+ if(fill) el.setAttribute("fill",fill);
+ el.textContent=text;
+ group.appendChild(el);
+ return el;
 }
 
 function calc(){
@@ -246,26 +302,31 @@ function calc(){
  }
 
  try{
-  // Use the selected date/time, or current time until Apply is used.
+  // Default: live current time. Apply करने पर selected time स्थिर रहेगा।
   const now=selectedDateTime || new Date();
+  const ay=ayanamsha(now);
 
   document.getElementById("time").textContent=
-   "कुंडली समय (दिल्ली): "+new Intl.DateTimeFormat("en-IN",{
+   "कुंडली समय (दिल्ली): "+
+   new Intl.DateTimeFormat("en-IN",{
     timeZone:"Asia/Kolkata",
     dateStyle:"medium",
     timeStyle:"medium"
    }).format(now);
 
-  const ay=ayanamsha(now);
-
   const data=planets.map(([body,name,color])=>{
    const lon=siderealLongitude(Astronomy.Body[body],now);
-   return {name,color,lon,sign:Math.floor(lon/30),within:lon%30};
+   return {
+    name,color,lon,
+    sign:Math.floor(lon/30),
+    within:lon%30
+   };
   });
 
   // Mean lunar node approximation
   const jd=now.getTime()/86400000+2440587.5;
   const T=(jd-2451545)/36525;
+
   const rahu=norm(
    125.04452-1934.136261*T+
    0.0020708*T*T+T*T*T/450000
@@ -278,38 +339,48 @@ function calc(){
    sign:Math.floor(rahuLon/30),within:rahuLon%30
   });
 
-  const klon=norm(rahuLon+180);
+  const ketuLon=norm(rahuLon+180);
 
   data.push({
-   name:"केतु",color:"#a05bc4",lon:klon,
-   sign:Math.floor(klon/30),within:klon%30
+   name:"केतु",color:"#a05bc4",lon:ketuLon,
+   sign:Math.floor(ketuLon/30),within:ketuLon%30
   });
 
-  const bySign=Array.from({length:12},()=>[]);
-  data.forEach(p=>bySign[p.sign].push(p));
+  // लग्न राशि और लग्न का भाव
+  const lagnaLon=calculateLagna(now);
+  const lagnaSign=Math.floor(lagnaLon/30);
+  const lagnaDegree=lagnaLon%30;
+
+  // ग्रहों को राशि के बजाय लग्न से गिने गए भाव में रखें।
+  const byHouse=Array.from({length:12},()=>[]);
+
+  data.forEach(p=>{
+   const house=(p.sign-lagnaSign+12)%12;
+   byHouse[house].push(p);
+  });
 
   const g=document.getElementById("labels");
   g.innerHTML="";
 
-  for(let i=0;i<12;i++){
-   const target=(i+rotationOffset+12)%12;
+  for(let house=0;house<12;house++){
+   const target=(house+rotationOffset+12)%12;
    const [x,y]=positions[target];
 
-   const h=document.createElementNS("http://www.w3.org/2000/svg","text");
-   h.setAttribute("x",x);
-   h.setAttribute("y",y);
-   h.setAttribute("class","house");
-   h.textContent=String(i+1);
-   g.appendChild(h);
+   // North Indian chart में नंबर राशि को दिखाता है।
+   const signNumber=((lagnaSign+house)%12)+1;
 
-   bySign[i].forEach((p,j)=>{
-    const el=document.createElementNS("http://www.w3.org/2000/svg","text");
-    el.setAttribute("x",x);
-    el.setAttribute("y",y+16+(j*14));
-    el.setAttribute("class","planet");
-    el.setAttribute("fill",p.color);
-    el.textContent=p.name;
-    g.appendChild(el);
+   addSvgText(g,x,y,"house",String(signNumber));
+
+   // लग्न भाव पर लग्न का छोटा निशान
+   if(house===0){
+    addSvgText(g,x,y+12,"lagna-label","लग्न");
+   }
+
+   byHouse[house].forEach((p,j)=>{
+    const startY=y+(house===0?26:16);
+    addSvgText(
+     g,x,startY+j*14,"planet",p.name,p.color
+    );
    });
   }
 
@@ -318,11 +389,14 @@ function calc(){
   ).join("");
 
   document.getElementById("status").textContent=
-   "ग्रहों की अनुमानित खगोलीय गणना · Lahiri ayanamsha";
+   `दिल्ली का लग्न: ${signs[lagnaSign]} ${degText(lagnaDegree)} · `+
+   (selectedDateTime ? "चुना हुआ समय" : "लाइव कुंडली")+
+   " · अनुमानित Lahiri ayanamsha";
 
  }catch(e){
+  console.error(e);
   document.getElementById("status").textContent=
-   "गणना में त्रुटि हुई। लाइब्रेरी/API जाँच की ज़रूरत है।";
+   "गणना में त्रुटि हुई। इंटरनेट और गणना लाइब्रेरी जाँचें।";
  }
 }
 
