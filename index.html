@@ -321,8 +321,24 @@ function updateInsightPanels(data,lagnaSign,now){
    const lordText=lordPlanet?`इस भाव की राशि ${signs[signIndex]} है और स्वामी ${lord} ${signs[lordPlanet.sign]} राशि के ${lordHouse}वें भाव में स्थित है। इसलिए इस भाव के विषयों का संबंध ${houseNames[lordHouse-1].toLowerCase()} से भी जोड़ा जा सकता है।`:`इस भाव की राशि ${signs[signIndex]} है और उसका स्वामी ${lord} है; स्वामी की उपलब्ध स्थिति के आधार पर आगे का विश्लेषण किया जाता है।`;
    return `<section class="details-section"><h3>${houseNames[i]}</h3><p><strong>मुख्य विषय:</strong> ${houseTopics[i]}</p><p><strong>भाव की राशि:</strong> ${signs[signIndex]} — ${signStyles[signIndex]}। ${lordText}</p>${planetText}</section>`;
  });
- const activeDasha=dashaAt(moon.lon,now),activeYogini=yoginiDashaAt(moon.lon,now);
- const advice=[`<p><strong>कुंडली का आधार:</strong> इस समय की कुंडली में लग्न <strong>${lagna}</strong> और चंद्र राशि <strong>${sign}</strong> है। नीचे बारहों भावों का फलादेश, प्रत्येक भाव की राशि, उसके स्वामी की स्थिति और उसमें मौजूद ग्रहों के आधार पर दिया गया है।</p>`,...houseReports,`<p class="panel-note">यह पारंपरिक वैदिक-ज्योतिष पर आधारित सामान्य व्याख्या है, निश्चित भविष्यवाणी नहीं। खाली भाव को निष्फल नहीं माना जाता; भावेश, दृष्टि, ग्रहबल और दशा जैसे अन्य कारक भी संपूर्ण कुंडली में देखे जाते हैं।</p>`];
+ const planetReports=["सूर्य","चंद्र","मंगल","बुध","गुरु","शुक्र","शनि","राहु","केतु"].map(name=>{
+   const p=data.find(x=>x.name===name);
+   if(!p) return `<section class="details-section"><h3>${name} ग्रह का फलादेश</h3><p>इस ग्रह की स्थिति उपलब्ध गणना में नहीं मिली।</p></section>`;
+   const house=((p.sign-lagnaSign+12)%12)+1, lord=signLords[p.sign], lordPlanet=data.find(x=>x.name===lord);
+   const position=`${name} ${signs[p.sign]} राशि के ${house}वें भाव में स्थित है। इस राशि का स्वामी ${lord} है।`;
+   const dignity=`राशि का स्वभाव ${signStyles[p.sign]} है; इसलिए ग्रह के सामान्य संकेत इस स्वभाव के माध्यम से व्यक्त होने की पारंपरिक व्याख्या की जाती है।`;
+   const houseText=houseTopics[house-1];
+   const lordText=lordPlanet?`राशि स्वामी ${lord} ${signs[lordPlanet.sign]} राशि के ${((lordPlanet.sign-lagnaSign+12)%12)+1}वें भाव में है; इससे ग्रह के फल की व्याख्या में उस भाव के विषय भी देखे जाते हैं।`:`राशि स्वामी ${lord} की स्थिति भी विस्तृत विश्लेषण में देखी जाती है।`;
+   return `<section class="details-section"><h3>${name} ग्रह का अलग-अलग फलादेश</h3><p><strong>स्थिति:</strong> ${position}</p><p><strong>ग्रह का सामान्य प्रभाव:</strong> ${planetEffects[name]||"इस ग्रह के पारंपरिक संकेत"}</p><p><strong>राशि के अनुसार प्रभाव:</strong> ${dignity}</p><p><strong>भाव के अनुसार फल:</strong> ${houseText}</p><p><strong>राशि स्वामी:</strong> ${lordText}</p></section>`;
+ });
+ const signReports=Array.from({length:12},(_,i)=>{
+   const occupants=data.filter(p=>p.sign===i);
+   const lord=signLords[i],lordPlanet=data.find(p=>p.name===lord),lordHouse=lordPlanet?((lordPlanet.sign-lagnaSign+12)%12)+1:null;
+   const planetText=occupants.length?occupants.map(p=>`<p><strong>${p.name} — ${signs[i]} राशि में:</strong> ${planetEffects[p.name]||"इस ग्रह के विषय"} इस राशि के स्वभाव (${signStyles[i]}) के कारण इन संकेतों की अभिव्यक्ति में उस राशि की प्रकृति भी जुड़ती है। व्यावहारिक फल समझने के लिए ग्रह का भाव-स्थान और राशि स्वामी की स्थिति भी साथ देखी जाती है।</p>`).join(""):`<p>इस राशि में वर्तमान ग्रह-सूची के अनुसार कोई ग्रह स्थित नहीं है। इसलिए यहाँ किसी ग्रह का प्रत्यक्ष राशि-फल नहीं दिया जा रहा; राशि स्वामी की स्थिति और कुंडली में संबंधित भाव को साथ देखकर अर्थ निकाला जाता है।`;
+   const lordText=lordPlanet?`राशि स्वामी ${lord} ${signs[lordPlanet.sign]} राशि के ${lordHouse}वें भाव में स्थित है। इससे इस राशि के विषयों का संबंध ${houseNames[lordHouse-1].toLowerCase()} से भी जोड़ा जाता है।`:`इस राशि का स्वामी ${lord} है; उपलब्ध ग्रह-स्थिति के आधार पर उसका फल देखा जाता है।`;
+   return `<section class="details-section"><h3>${signs[i]} राशि में ग्रहों का प्रभाव एवं फल</h3><p><strong>राशि का स्वभाव:</strong> ${signStyles[i]}। ${lordText}</p>${planetText}</section>`;
+ });
+ const advice=[`<p><strong>कुंडली का आधार:</strong> लग्न <strong>${lagna}</strong> और चंद्र राशि <strong>${sign}</strong> है। फलादेश क्रमशः पहले 12 भावों का अलग-अलग, फिर 9 ग्रहों का अलग-अलग, और अंत में 12 राशियों में ग्रहों के प्रभाव का विवरण देता है।</p>`,`<h3>कुंडली के 12 भावों का विस्तृत फलादेश</h3>`,...houseReports,`<h3>9 ग्रहों का अलग-अलग फलादेश</h3>`,...planetReports,`<h3>12 राशियों में ग्रहों का प्रभाव और फल</h3>`,...signReports,`<p class="panel-note">यह पारंपरिक वैदिक-ज्योतिष पर आधारित सामान्य व्याख्या है, निश्चित भविष्यवाणी नहीं। खाली भाव या राशि को निष्फल नहीं माना जाता; भावेश, ग्रहों की स्थिति, दृष्टि और ग्रहबल जैसे कारक भी संपूर्ण कुंडली में देखे जाते हैं।</p>`];
  document.getElementById("predictionContent").innerHTML=advice.join("");
 }
 function calc(){
