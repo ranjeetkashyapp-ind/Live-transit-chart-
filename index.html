@@ -158,7 +158,6 @@ th,td{
 
 th{color:var(--line)}
 
-/* नए विवरण सेक्शन */
 .details-section{
   margin-top:22px;
   padding:14px;
@@ -270,26 +269,21 @@ th{color:var(--line)}
   <tbody id="rows"></tbody>
 </table>
 
-<!-- जन्म विवरण -->
 <section class="details-section">
   <h3>जन्म विवरण / Birth Details</h3>
-
   <div class="details-grid">
     <div class="detail-item">
       <div class="detail-label">जन्म तारीख</div>
       <div class="detail-value" id="birthDate">—</div>
     </div>
-
     <div class="detail-item">
       <div class="detail-label">जन्म समय (IST)</div>
       <div class="detail-value" id="birthTime">—</div>
     </div>
-
     <div class="detail-item">
       <div class="detail-label">जन्म स्थान</div>
       <div class="detail-value">दिल्ली, भारत</div>
     </div>
-
     <div class="detail-item">
       <div class="detail-label">लग्न राशि</div>
       <div class="detail-value" id="birthLagna">—</div>
@@ -297,36 +291,29 @@ th{color:var(--line)}
   </div>
 </section>
 
-<!-- पंचांग विवरण -->
 <section class="details-section">
   <h3>पंचांग विवरण / Panchang Details</h3>
-
   <div class="details-grid">
     <div class="detail-item">
       <div class="detail-label">वार</div>
       <div class="detail-value" id="pWeekday">—</div>
     </div>
-
     <div class="detail-item">
       <div class="detail-label">तिथि</div>
       <div class="detail-value" id="pTithi">—</div>
     </div>
-
     <div class="detail-item">
       <div class="detail-label">पक्ष</div>
       <div class="detail-value" id="pPaksha">—</div>
     </div>
-
     <div class="detail-item">
       <div class="detail-label">नक्षत्र</div>
       <div class="detail-value" id="pNakshatra">—</div>
     </div>
-
     <div class="detail-item">
       <div class="detail-label">योग</div>
       <div class="detail-value" id="pYoga">—</div>
     </div>
-
     <div class="detail-item">
       <div class="detail-label">करण</div>
       <div class="detail-value" id="pKarana">—</div>
@@ -364,7 +351,6 @@ const positions=[
   [355,285],[295,200],[355,120],[295,60]
 ];
 
-/* पंचांग नाम */
 const weekdays=[
   "रविवार","सोमवार","मंगलवार","बुधवार",
   "गुरुवार","शुक्रवार","शनिवार"
@@ -535,7 +521,6 @@ function calculateLagna(date){
   return norm(tropical-ayanamsha(date));
 }
 
-/* जन्म विवरण और पंचांग अपडेट */
 function updateBirthAndPanchang(date,lagnaSign,lagnaDegree){
   const dateOptions={
     timeZone:"Asia/Kolkata",
@@ -560,7 +545,6 @@ function updateBirthAndPanchang(date,lagnaSign,lagnaDegree){
   document.getElementById("birthLagna").textContent=
     signs[lagnaSign]+" "+degText(lagnaDegree);
 
-  /* सप्ताह का वार */
   const weekdayName=new Intl.DateTimeFormat("en-US",{
     timeZone:"Asia/Kolkata",
     weekday:"short"
@@ -573,7 +557,6 @@ function updateBirthAndPanchang(date,lagnaSign,lagnaDegree){
   document.getElementById("pWeekday").textContent=
     weekdays[weekdayIndex];
 
-  /* सूर्य और चंद्रमा की स्थिति */
   const sunTropical=Astronomy.Ecliptic(
     Astronomy.GeoVector(Astronomy.Body.Sun,date,true)
   ).elon;
@@ -586,7 +569,6 @@ function updateBirthAndPanchang(date,lagnaSign,lagnaDegree){
   const sunSidereal=norm(sunTropical-ayan);
   const moonSidereal=norm(moonTropical-ayan);
 
-  /* तिथि और पक्ष */
   const elongation=norm(moonTropical-sunTropical);
   const tithiIndex=Math.min(29,Math.floor(elongation/12));
 
@@ -605,13 +587,11 @@ function updateBirthAndPanchang(date,lagnaSign,lagnaDegree){
   document.getElementById("pPaksha").textContent=
     elongation<180 ? "शुक्ल पक्ष" : "कृष्ण पक्ष";
 
-  /* नक्षत्र */
   const nakIndex=Math.floor(moonSidereal/(360/27))%27;
 
   document.getElementById("pNakshatra").textContent=
     nakshatras[nakIndex];
 
-  /* योग */
   const yogaIndex=Math.floor(
     norm(sunSidereal+moonSidereal)/(360/27)
   )%27;
@@ -619,7 +599,6 @@ function updateBirthAndPanchang(date,lagnaSign,lagnaDegree){
   document.getElementById("pYoga").textContent=
     yogas[yogaIndex];
 
-  /* करण */
   const karanaIndex=Math.floor(elongation/6)%60;
   let karanaName;
 
@@ -715,7 +694,6 @@ function calc(){
     const lagnaSign=Math.floor(lagnaLon/30);
     const lagnaDegree=lagnaLon%30;
 
-    /* जन्म और पंचांग विवरण अपडेट */
     updateBirthAndPanchang(now,lagnaSign,lagnaDegree);
 
     const byHouse=Array.from({length:12},()=>[]);
@@ -736,7 +714,7 @@ function calc(){
       const dy=y-200;
       const distance=Math.sqrt(dx*dx+dy*dy);
 
-      /* बाकी सभी भावों की मूल पोज़िशन समान */
+      /* मूल पोज़िशन सभी भावों के लिए समान */
       const move=24;
 
       const xNew=x+(dx/distance)*move;
@@ -744,23 +722,37 @@ function calc(){
 
       const signNumber=((lagnaSign+house)%12)+1;
 
-      /* केवल पहला और सातवाँ भाव अंदर */
+      /*
+        केवल पहला भाव (लग्न) और सातवाँ भाव
+        अंदर होंगे। बाकी भावों में inwardMove = 0.
+      */
       const isTargetHouse=(house===0 || house===6);
       const inwardMove=isTargetHouse ? 15 : 0;
 
       const signX=xNew-(dx/distance)*inwardMove;
       const signY=yNew-(dy/distance)*inwardMove;
 
-      addSvgText(g,signX,signY,"house",String(signNumber));
+      addSvgText(
+        g,
+        signX,
+        signY,
+        "house",
+        String(signNumber)
+      );
 
       if(house===0){
-        addSvgText(g,xNew,yNew+12,"lagna-label","लग्न");
+        addSvgText(
+          g,
+          signX,
+          signY+12,
+          "lagna-label",
+          "लग्न"
+        );
       }
 
-      /* ग्रह केवल पहले और सातवें भाव में अंदर */
       byHouse[house].forEach((p,j)=>{
-        const planetX=xNew-(dx/distance)*inwardMove;
-        const planetY=yNew-(dy/distance)*inwardMove;
+        const planetX=signX;
+        const planetY=signY;
         const startY=planetY+(house===0?26:16);
 
         addSvgText(
