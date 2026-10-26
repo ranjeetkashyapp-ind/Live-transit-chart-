@@ -721,8 +721,8 @@ function calc(){
 
       const signNumber=((lagnaSign+house)%12)+1;
 
-      // केवल सातवें भाव को 60 पॉइंट अंदर किया गया है
-      const inwardMove = house === 6 ? 60 : 0;
+      // केवल सातवें भाव की राशि और ग्रह 70 पॉइंट अंदर
+      const inwardMove = house === 6 ? 70 : 0;
 
       const signX=xNew-(dx/distance)*inwardMove;
       const signY=yNew-(dy/distance)*inwardMove;
