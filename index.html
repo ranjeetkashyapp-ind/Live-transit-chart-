@@ -25,8 +25,8 @@ svg{display:block;width:100%;height:auto;max-width:600px;margin:auto}
 .lagna-label{font-size:14px;fill:var(--line);text-anchor:middle;font-weight:bold}
 .planet{font-size:14px;font-weight:bold;text-anchor:middle}
 #status{text-align:center;font-size:13px;color:var(--muted);margin:12px 0}
-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
-th,td{text-align:left;padding:8px 4px;border-bottom:1px solid #e6d4bf}
+table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:13px;margin-top:12px}
+th,td{width:25%;text-align:left;padding:8px 4px;border-bottom:1px solid #e6d4bf;overflow-wrap:anywhere}
 th{color:var(--line)}
 .details-section{margin-top:22px;padding:14px;border:1px solid var(--line);border-radius:10px;background:#fffdf8}
 .details-section h3{text-align:center;color:var(--line);font-size:18px;margin:0 0 12px}
@@ -152,14 +152,16 @@ function updateBirthAndPanchang(date,lagnaSign,lagnaDegree){
 }
 function addSvgText(group,x,y,className,text,fill){const el=document.createElementNS("http://www.w3.org/2000/svg","text");el.setAttribute("x",x);el.setAttribute("y",y);el.setAttribute("class",className);if(fill)el.setAttribute("fill",fill);el.textContent=text;group.appendChild(el);return el}
 
-/* ग्रहों की गति और सूर्य से कोणीय दूरी के आधार पर स्थिति का अनुमान */
+/* ग्रहों की वास्तविक दैनिक गति और सूर्य से कोणीय दूरी के आधार पर स्थिति */
 function getPlanetStatus(p, now, sunSidereal) {
-  if (p.name === "सूर्य") return "—";
+  // सूर्य की गति हमेशा मार्गी दिखाई जाती है; राहु-केतु हमेशा वक्री।
+  if (p.name === "सूर्य") return "मार्गी";
   if (p.name === "राहु" || p.name === "केतु") return "वक्री";
 
   const bodyName = planets.find(x => x[1] === p.name)?.[0];
   if (!bodyName) return "—";
 
+  // 24 घंटे के अंतर से ग्रह की राशि-देशांतर गति जाँचें; 180° पार होने पर दिशा सही करें।
   const body = Astronomy.Body[bodyName];
   const tomorrow = new Date(now.getTime() + 86400000);
   const lon1 = siderealLongitude(body, now);
@@ -167,18 +169,22 @@ function getPlanetStatus(p, now, sunSidereal) {
   let speed = norm(lon2 - lon1);
   if (speed > 180) speed -= 360;
 
+  const motion = (p.name === "चंद्र") ? "मार्गी" : (speed < 0 ? "वक्री" : "मार्गी");
+
+  // अस्त/दग्ध स्थिति सूर्य से न्यूनतम कोणीय दूरी (डिग्री) से जाँची जाती है।
+  // परंपरागत प्रचलित सीमाएँ; बुध/शुक्र के वक्री होने पर कुछ कम सीमा लागू होती है।
   const separationRaw = norm(p.lon - sunSidereal);
   const separation = separationRaw > 180 ? 360 - separationRaw : separationRaw;
-  const limits = {
-    "चंद्र": 12,
-    "मंगल": 17,
-    "बुध": 14,
-    "गुरु": 11,
-    "शुक्र": 10,
-    "शनि": 15
-  };
-  const motion = speed < 0 ? "वक्री" : "मार्गी";
-  if (separation < (limits[p.name] || 10)) return motion + " · अस्त";
+  let limit = null;
+  if (p.name === "चंद्र") limit = 12;
+  else if (p.name === "मंगल") limit = 17;
+  else if (p.name === "बुध") limit = speed < 0 ? 12 : 14;
+  else if (p.name === "गुरु") limit = 11;
+  else if (p.name === "शुक्र") limit = speed < 0 ? 8 : 10;
+  else if (p.name === "शनि") limit = 15;
+
+  // राहु-केतु पर अस्त लागू नहीं होता; अन्य ग्रहों के लिए सूर्य से कोणीय दूरी जाँची जाती है।
+  if (limit !== null && separation <= limit) return motion + " · अस्त";
   return motion + " · उदय";
 }
 
