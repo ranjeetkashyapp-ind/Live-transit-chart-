@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="hi">
 <head>
@@ -720,12 +721,11 @@ function calc(){
 
       const signNumber=((lagnaSign+house)%12)+1;
 
-      /* केवल छठे, सातवें और आठवें भाव की पोज़िशन बदली गई है */
+      /* केवल छठे भाव को 40 पॉइंट अंदर किया गया है */
       let inwardMove=0;
 
-      if(house===5) inwardMove=35; // छठा भाव
-      if(house===6) inwardMove=40; // सातवाँ भाव
-      if(house===7) inwardMove=35; // आठवाँ भाव
+      if(house===5) inwardMove=40; // छठा भाव
+      if(house===6) inwardMove=40; // सातवाँ भाव, पहले जैसा
 
       const signX=xNew-(dx/distance)*inwardMove;
       const signY=yNew-(dy/distance)*inwardMove;
