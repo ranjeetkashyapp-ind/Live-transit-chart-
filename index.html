@@ -86,6 +86,7 @@ th{color:var(--line)}
 <button type="button" class="kundli-tab" data-panel="dosha-panel">दोष</button>
 <button type="button" class="kundli-tab" data-panel="dasha-panel">ग्रहों की दशा</button>
 <button type="button" class="kundli-tab" data-panel="prediction-panel">फलादेश</button>
+<button type="button" class="kundli-tab" data-panel="ashtakoot-panel">कुंडली मिलान</button>
 </nav>
 <section id="birth-panel" class="tab-panel">
 <section class="details-section">
@@ -124,6 +125,19 @@ th{color:var(--line)}
 <section id="dosha-panel" class="tab-panel" hidden><section class="details-section"><h3>दोष</h3><div class="details-list" id="doshaContent"><div class="detail-line"><span class="detail-label">स्थिति</span><span class="detail-value">गणना हो रही है…</span></div></div><p class="panel-note">दोष की गणना प्रचलित ज्योतिषीय नियमों पर आधारित संकेतात्मक आकलन है; अलग-अलग परंपराओं में नियम बदल सकते हैं।</p></section></section>
 <section id="dasha-panel" class="tab-panel" hidden><section class="details-section"><h3>ग्रहों की महादशा, अंतरदशा और प्रत्यंतरदशा</h3><div class="details-list" id="dashaContent"><div class="detail-line"><span class="detail-label">दशा</span><span class="detail-value">गणना हो रही है…</span></div></div></section><section class="details-section"><h3>योगिनी महादशा और योगिनी अंतरदशा</h3><div class="details-list" id="yoginiDashaContent"><div class="detail-line"><span class="detail-label">दशा</span><span class="detail-value">गणना हो रही है…</span></div></div></section></section>
 <section id="prediction-panel" class="tab-panel" hidden><section class="details-section"><h3>राशि और ग्रहों की स्थिति के अनुसार विस्तृत फलादेश</h3><div id="predictionContent" class="prediction-content">गणना हो रही है…</div><p class="panel-note">यह सामान्य ज्योतिषीय व्याख्या है, निश्चित भविष्यवाणी नहीं।</p></section></section>
+<section id="ashtakoot-panel" class="tab-panel" hidden>
+ <section class="details-section">
+  <h3>अष्टकूट गुण मिलान</h3>
+  <p class="panel-note">दोनों व्यक्तियों की जन्म तारीख और समय भरें। चंद्र राशि और जन्म नक्षत्र के आधार पर पारंपरिक 36 गुणों का अनुमानित मिलान दिखाया जाएगा।</p>
+  <div class="details-grid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px">
+   <div><h4>व्यक्ति 1</h4><label class="detail-label" for="matchDate1">जन्म तारीख</label><input id="matchDate1" type="date" style="width:100%;padding:9px;border:1px solid var(--line);border-radius:6px;background:#fff8ed;color:var(--ink)"><label class="detail-label" for="matchTime1" style="display:block;margin-top:8px">जन्म समय</label><input id="matchTime1" type="time" value="12:00" style="width:100%;padding:9px;border:1px solid var(--line);border-radius:6px;background:#fff8ed;color:var(--ink)"></div>
+   <div><h4>व्यक्ति 2</h4><label class="detail-label" for="matchDate2">जन्म तारीख</label><input id="matchDate2" type="date" style="width:100%;padding:9px;border:1px solid var(--line);border-radius:6px;background:#fff8ed;color:var(--ink)"><label class="detail-label" for="matchTime2" style="display:block;margin-top:8px">जन्म समय</label><input id="matchTime2" type="time" value="12:00" style="width:100%;padding:9px;border:1px solid var(--line);border-radius:6px;background:#fff8ed;color:var(--ink)"></div>
+  </div>
+  <p style="margin-top:14px"><button type="button" class="apply-btn" id="calculateAshtakoot">अष्टकूट मिलान करें</button></p>
+  <div id="ashtakootResult" class="prediction-content" aria-live="polite">जन्म विवरण भरकर “अष्टकूट मिलान करें” दबाएँ।</div>
+  <p class="panel-note">यह पारंपरिक अष्टकूट पद्धति पर आधारित संकेतात्मक गणना है। अलग-अलग पंचांग/परंपराओं में स्कोर बदल सकता है; इसे विवाह या रिश्ते का अकेला निर्णय-आधार न मानें।</p>
+ </section>
+</section>
 <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
 <script>
 const signs=["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
@@ -377,7 +391,41 @@ function calc(){
  document.getElementById("status").textContent=`दिल्ली का लग्न: ${signs[lagnaSign]} ${degText(lagnaDegree)} · `+(selectedDateTime?"चुना हुआ समय":"लाइव कुंडली")+" · अनुमानित Lahiri ayanamsha";
  }catch(e){console.error(e);document.getElementById("status").textContent="गणना में त्रुटि हुई। इंटरनेट और गणना लाइब्रेरी जाँचें।"}
 }
-setupKundliTabs();calc();setInterval(calc,60000);setInterval(updateLiveClock,1000);
+
+function setupAshtakoot(){
+ const nakNames=["अश्विनी","भरणी","कृत्तिका","रोहिणी","मृगशीर्ष","आर्द्रा","पुनर्वसु","पुष्य","आश्लेषा","मघा","पूर्वा फाल्गुनी","उत्तरा फाल्गुनी","हस्त","चित्रा","स्वाती","विशाखा","अनुराधा","ज्येष्ठा","मूल","पूर्वाषाढ़ा","उत्तराषाढ़ा","श्रवण","धनिष्ठा","शतभिषा","पूर्वा भाद्रपद","उत्तरा भाद्रपद","रेवती"];
+ const gana=[0,1,2,0,0,1,0,0,1,1,1,0,0,1,0,0,0,1,1,1,0,0,1,0,1,0,0]; // देव=0, मनुष्य=1, राक्षस=2
+ const yoni=[0,1,2,3,4,5,6,7,8,9,10,11,4,5,6,7,8,9,10,11,2,3,0,1,5,7,6];
+ const nadi=[0,1,2,0,1,2,0,1,2,0,1,2,0,1,2,0,1,2,0,1,2,0,1,2,0,1,2];
+ const varnaBySign=[3,2,1,0,3,2,1,0,3,2,1,0]; // ब्राह्मण=0, क्षत्रिय=1, वैश्य=2, शूद्र=3 (पारंपरिक सरलीकरण)
+ const vashyaBySign=[0,1,2,3,0,1,2,3,0,1,2,3];
+ const signLordIdx=[2,4,3,1,0,3,4,2,5,6,6,5]; // सूर्य चंद्र मंगल बुध गुरु शुक्र शनि के अनुरूप नहीं, नीचे नाम से उपयोग
+ const lordBySign=["मंगल","शुक्र","बुध","चंद्र","सूर्य","बुध","शुक्र","मंगल","गुरु","शनि","शनि","गुरु"];
+ const friend={"सूर्य":{"सूर्य":5,"चंद्र":5,"मंगल":5,"बुध":4,"गुरु":5,"शुक्र":0,"शनि":0},"चंद्र":{"सूर्य":5,"चंद्र":5,"मंगल":4,"बुध":3,"गुरु":4,"शुक्र":3,"शनि":3},"मंगल":{"सूर्य":5,"चंद्र":4,"मंगल":5,"बुध":1,"गुरु":4,"शुक्र":2,"शनि":3},"बुध":{"सूर्य":4,"चंद्र":1,"मंगल":3,"बुध":5,"गुरु":2,"शुक्र":4,"शनि":3},"गुरु":{"सूर्य":5,"चंद्र":4,"मंगल":4,"बुध":2,"गुरु":5,"शुक्र":1,"शनि":3},"शुक्र":{"सूर्य":0,"चंद्र":2,"मंगल":3,"बुध":4,"गुरु":2,"शुक्र":5,"शनि":4},"शनि":{"सूर्य":0,"चंद्र":2,"मंगल":2,"बुध":4,"गुरु":3,"शुक्र":4,"शनि":5}};
+ function details(date,time){const d=new Date(date+"T"+(time||"12:00")+":00");if(Number.isNaN(d.getTime()))throw Error("जन्म तारीख और समय सही भरें।");const lon=siderealLongitude(Astronomy.Body.Moon,d),si=Math.floor(lon/30),ni=Math.floor(lon/(360/27));return {date:d,lon,sign:si,nak:ni};}
+ function tara(a,b){const n=((b-a+27)%27)+1;return [1,3,5,7].includes(n%9)?3:0;}
+ function score(a,b){
+  const varna=(varnaBySign[a.sign]>=varnaBySign[b.sign])?1:0;
+  const vashya=a.sign%4===b.sign%4?2:1;
+  const taraScore=(tara(a.nak,b.nak)+tara(b.nak,a.nak))/2;
+  const yoniScore=yoni[a.nak]===yoni[b.nak]?4:(Math.abs(yoni[a.nak]-yoni[b.nak])===1?3:Math.abs(yoni[a.nak]-yoni[b.nak])===2?2:1);
+  const l1=lordBySign[a.sign],l2=lordBySign[b.sign],graha=(friend[l1]&&friend[l1][l2]!==undefined)?friend[l1][l2]:3;
+  const g1=gana[a.nak],g2=gana[b.nak],ganaScore=g1===g2?6:((g1===0&&g2===1)||(g1===1&&g2===0))?5:((g1===1&&g2===2)||(g1===2&&g2===1))?1:0;
+  const dist=(b.sign-a.sign+12)%12+1,rev=(a.sign-b.sign+12)%12+1;const bhakoot=([2,5,6,8,9,12].includes(dist)||[2,5,6,8,9,12].includes(rev))?0:7;
+  const nadiScore=nadi[a.nak]===nadi[b.nak]?0:8;
+  const rows=[["वर्ण",varna,1],["वश्य",vashya,2],["तारा",taraScore,3],["योनि",yoniScore,4],["ग्रह मैत्री",graha,5],["गण",ganaScore,6],["भकूट",bhakoot,7],["नाड़ी",nadiScore,8]];
+  return {rows,total:rows.reduce((s,r)=>s+r[1],0)};
+ }
+ document.getElementById("calculateAshtakoot").addEventListener("click",()=>{
+  const d1=document.getElementById("matchDate1").value,d2=document.getElementById("matchDate2").value,t1=document.getElementById("matchTime1").value,t2=document.getElementById("matchTime2").value,out=document.getElementById("ashtakootResult");
+  if(!d1||!d2){out.innerHTML="<p>कृपया दोनों व्यक्तियों की जन्म तारीख भरें।</p>";return;}
+  try{const a=details(d1,t1),b=details(d2,t2),res=score(a,b),pct=(res.total/36*100).toFixed(1);const label=res.total>=27?"उच्च गुण मिलान":res.total>=18?"मध्यम गुण मिलान":"कम गुण मिलान";
+   out.innerHTML=`<section class="details-section"><h3>कुल मिलान: ${res.total.toFixed(1)} / 36 गुण (${pct}%)</h3><p><strong>${label}</strong></p><p>व्यक्ति 1: ${signs[a.sign]} राशि · ${nakNames[a.nak]} नक्षत्र</p><p>व्यक्ति 2: ${signs[b.sign]} राशि · ${nakNames[b.nak]} नक्षत्र</p><table><thead><tr><th>कूट</th><th>प्राप्त गुण</th><th>अधिकतम</th></tr></thead><tbody>${res.rows.map(r=>`<tr><td>${r[0]}</td><td>${Number(r[1]).toFixed(1)}</td><td>${r[2]}</td></tr>`).join("")}</tbody></table></section>`;
+  }catch(e){out.innerHTML=`<p>${e.message||"गणना नहीं हो सकी।"}</p>`;}
+ });
+}
+
+setupKundliTabs();setupAshtakoot();calc();setInterval(calc,60000);setInterval(updateLiveClock,1000);
 </script>
 </body>
 </html>
