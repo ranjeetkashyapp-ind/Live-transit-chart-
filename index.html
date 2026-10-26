@@ -687,7 +687,7 @@ function calc(){
       color:"#a05bc4",
       lon:ketuLon,
       sign:Math.floor(ketuLon/30),
-      within:lonWithin(ketuLon)
+      within:ketuLon%30
     });
 
     const lagnaLon=calculateLagna(now);
@@ -721,15 +721,9 @@ function calc(){
 
       const signNumber=((lagnaSign+house)%12)+1;
 
-      /* पहले, चौथे, छठे और सातवें भाव अंदर */
-      const isTargetHouse=(
-        house===0 ||
-        house===3 ||
-        house===5 ||
-        house===6
-      );
-
-      const inwardMove=isTargetHouse ? 40 : 0;
+      /* केवल सातवें और आठवें भाव 35 यूनिट अंदर */
+      const isTargetHouse=(house===6 || house===7);
+      const inwardMove=isTargetHouse ? 35 : 0;
 
       const signX=xNew-(dx/distance)*inwardMove;
       const signY=yNew-(dy/distance)*inwardMove;
@@ -777,10 +771,6 @@ function calc(){
     document.getElementById("status").textContent=
       "गणना में त्रुटि हुई। इंटरनेट और गणना लाइब्रेरी जाँचें।";
   }
-}
-
-function lonWithin(longitude){
-  return longitude%30;
 }
 
 calc();
