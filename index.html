@@ -413,14 +413,28 @@ function setupAshtakoot(){
   const g1=gana[a.nak],g2=gana[b.nak],ganaScore=g1===g2?6:((g1===0&&g2===1)||(g1===1&&g2===0))?5:((g1===1&&g2===2)||(g1===2&&g2===1))?1:0;
   const dist=(b.sign-a.sign+12)%12+1,rev=(a.sign-b.sign+12)%12+1;const bhakoot=([2,5,6,8,9,12].includes(dist)||[2,5,6,8,9,12].includes(rev))?0:7;
   const nadiScore=nadi[a.nak]===nadi[b.nak]?0:8;
-  const rows=[["वर्ण",varna,1],["वश्य",vashya,2],["तारा",taraScore,3],["योनि",yoniScore,4],["ग्रह मैत्री",graha,5],["गण",ganaScore,6],["भकूट",bhakoot,7],["नाड़ी",nadiScore,8]];
-  return {rows,total:rows.reduce((s,r)=>s+r[1],0)};
+  const varnaNames=["ब्राह्मण","क्षत्रिय","वैश्य","शूद्र"];
+  const vashyaNames=["चतुष्पद","मानव","जलचर","वनचर"];
+  const ganaNames=["देव","मनुष्य","राक्षस"];
+  const yoniNames=["अश्व","गज","मेष","सर्प","श्वान","मार्जार","मूषक","गौ","महिष","व्याघ्र","मृग","वानर"];
+  const nadiNames=["आदि","मध्य","अंत्य"];
+  const rows=[
+   ["वर्ण",varnaNames[varnaBySign[a.sign]],varnaNames[varnaBySign[b.sign]],varna,1],
+   ["वश्य",vashyaNames[vashyaBySign[a.sign]],vashyaNames[vashyaBySign[b.sign]],vashya,2],
+   ["तारा",nakNames[a.nak],nakNames[b.nak],taraScore,3],
+   ["योनि",yoniNames[yoni[a.nak]%yoniNames.length],yoniNames[yoni[b.nak]%yoniNames.length],yoniScore,4],
+   ["ग्रह मैत्री",lordBySign[a.sign],lordBySign[b.sign],graha,5],
+   ["गण",ganaNames[gana[a.nak]],ganaNames[gana[b.nak]],ganaScore,6],
+   ["भकूट",signs[a.sign],signs[b.sign],bhakoot,7],
+   ["नाड़ी",nadiNames[nadi[a.nak]],nadiNames[nadi[b.nak]],nadiScore,8]
+  ];
+  return {rows,total:rows.reduce((s,r)=>s+r[3],0)};
  }
  document.getElementById("calculateAshtakoot").addEventListener("click",()=>{
   const d1=document.getElementById("matchDate1").value,d2=document.getElementById("matchDate2").value,t1=document.getElementById("matchTime1").value,t2=document.getElementById("matchTime2").value,out=document.getElementById("ashtakootResult");
   if(!d1||!d2){out.innerHTML="<p>कृपया दोनों व्यक्तियों की जन्म तारीख भरें।</p>";return;}
   try{const a=details(d1,t1),b=details(d2,t2),res=score(a,b),pct=(res.total/36*100).toFixed(1);const label=res.total>=27?"उच्च गुण मिलान":res.total>=18?"मध्यम गुण मिलान":"कम गुण मिलान";
-   out.innerHTML=`<section class="details-section"><h3>कुल मिलान: ${res.total.toFixed(1)} / 36 गुण (${pct}%)</h3><p><strong>${label}</strong></p><p>वर: ${signs[a.sign]} राशि · ${nakNames[a.nak]} नक्षत्र</p><p>वधू: ${signs[b.sign]} राशि · ${nakNames[b.nak]} नक्षत्र</p><table><thead><tr><th>कूट</th><th>प्राप्त गुण</th><th>अधिकतम</th></tr></thead><tbody>${res.rows.map(r=>`<tr><td>${r[0]}</td><td>${Number(r[1]).toFixed(1)}</td><td>${r[2]}</td></tr>`).join("")}</tbody></table></section>`;
+   out.innerHTML=`<section class="details-section"><h3>कुल मिलान: ${res.total.toFixed(1)} / 36 गुण (${pct}%)</h3><p><strong>${label}</strong></p><p>वर: ${signs[a.sign]} राशि · ${nakNames[a.nak]} नक्षत्र</p><p>वधू: ${signs[b.sign]} राशि · ${nakNames[b.nak]} नक्षत्र</p><table><thead><tr><th>कूट</th><th>वर</th><th>वधू</th><th>प्राप्त गुण</th></tr></thead><tbody>${res.rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${Number(r[3]).toFixed(1)} / ${r[4]}</td></tr>`).join("")}</tbody></table></section>`;
   }catch(e){out.innerHTML=`<p>${e.message||"गणना नहीं हो सकी।"}</p>`;}
  });
 }
