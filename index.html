@@ -1,1049 +1,183 @@
-
 <!DOCTYPE html>
 <html lang="hi">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Live Vedic Kundli</title>
-
 <style>
-:root {
-  --bg:#fff8ed;
-  --line:#a85d2b;
-  --ink:#392514;
-  --muted:#806c5b;
-}
-
+:root{--bg:#fff8ed;--line:#a85d2b;--ink:#392514;--muted:#806c5b}
 *{box-sizing:border-box}
-
-body{
-  margin:0;
-  padding:16px;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:Arial,sans-serif
-}
-
-h2{
-  font-size:20px;
-  text-align:center;
-  margin:6px 0
-}
-
-#time{
-  text-align:center;
-  color:var(--muted);
-  font-size:13px;
-  margin:8px 0 16px
-}
-
-.datetime-controls{
-  display:flex;
-  justify-content:center;
-  align-items:flex-end;
-  flex-wrap:nowrap;
-  gap:10px;
-  margin:0 auto 12px
-}
-
-.datetime-controls label{
-  display:flex;
-  flex-direction:column;
-  gap:5px;
-  color:var(--muted);
-  font-size:12px;
-  flex:1;
-  min-width:0
-}
-
-.datetime-controls input{
-  width:100%;
-  min-width:0;
-  background:#fff8ed;
-  color:#392514;
-  border:1px solid #a85d2b;
-  border-radius:6px;
-  padding:8px 4px;
-  font-family:Arial,sans-serif;
-  font-size:14px
-}
-
-.apply-btn,.rotate-btn{
-  background:#fff8ed;
-  color:#392514;
-  border:1px solid #a85d2b;
-  border-radius:6px;
-  padding:9px 14px;
-  font-size:14px;
-  font-weight:bold;
-  cursor:pointer
-}
-
-#liveNow{
-  display:inline-block;
-  margin:0 auto 10px
-}
-
-.live-now-row{
-  text-align:center;
-  margin:0 auto
-}
-
-.rotate-controls{
-  display:flex;
-  justify-content:center;
-  flex-wrap:wrap;
-  gap:12px;
-  margin:0 auto 12px
-}
-
+body{margin:0;padding:16px;background:var(--bg);color:var(--ink);font-family:Arial,sans-serif}
+h2{font-size:20px;text-align:center;margin:6px 0}
+#time{text-align:center;color:var(--muted);font-size:13px;margin:8px 0 16px}
+.datetime-controls{display:flex;justify-content:center;align-items:flex-end;flex-wrap:nowrap;gap:10px;margin:0 auto 12px}
+.datetime-controls label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:12px;flex:1;min-width:0}
+.datetime-controls input{width:100%;min-width:0;background:#fff8ed;color:#392514;border:1px solid #a85d2b;border-radius:6px;padding:8px 4px;font-family:Arial,sans-serif;font-size:14px}
+.apply-btn,.rotate-btn{background:#fff8ed;color:#392514;border:1px solid #a85d2b;border-radius:6px;padding:9px 14px;font-size:14px;font-weight:bold;cursor:pointer}
+#liveNow{display:inline-block;margin:0 auto 10px}
+.live-now-row{text-align:center;margin:0 auto}
+.rotate-controls{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin:0 auto 12px}
 .rotate-btn{padding:9px 16px}
-
-.rotate-btn:active,.apply-btn:active{
-  background:#f0dfca
-}
-
-svg{
-  display:block;
-  width:100%;
-  height:auto;
-  max-width:600px;
-  margin:auto
-}
-
-.frame{
-  fill:none;
-  stroke:var(--line);
-  stroke-width:1.5
-}
-
-.house{
-  font-size:12px;
-  fill:var(--muted);
-  text-anchor:middle
-}
-
-.lagna-label{
-  font-size:10px;
-  fill:var(--line);
-  text-anchor:middle;
-  font-weight:bold
-}
-
-.planet{
-  font-size:12px;
-  font-weight:bold;
-  text-anchor:middle
-}
-
-#status{
-  text-align:center;
-  font-size:13px;
-  color:var(--muted);
-  margin:12px 0
-}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-  font-size:13px;
-  margin-top:12px
-}
-
-th,td{
-  text-align:left;
-  padding:8px 4px;
-  border-bottom:1px solid #e6d4bf
-}
-
+.rotate-btn:active,.apply-btn:active{background:#f0dfca}
+svg{display:block;width:100%;height:auto;max-width:600px;margin:auto}
+.frame{fill:none;stroke:var(--line);stroke-width:1.5}
+.house{font-size:12px;fill:var(--muted);text-anchor:middle}
+.lagna-label{font-size:10px;fill:var(--line);text-anchor:middle;font-weight:bold}
+.planet{font-size:12px;font-weight:bold;text-anchor:middle}
+#status{text-align:center;font-size:13px;color:var(--muted);margin:12px 0}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
+th,td{text-align:left;padding:8px 4px;border-bottom:1px solid #e6d4bf}
 th{color:var(--line)}
-
-.details-section{
-  margin-top:22px;
-  padding:14px;
-  border:1px solid var(--line);
-  border-radius:10px;
-  background:#fffdf8
-}
-
-.details-section h3{
-  text-align:center;
-  color:var(--line);
-  font-size:18px;
-  margin:0 0 12px
-}
-
-.details-grid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:10px
-}
-
-.detail-item{
-  padding:10px;
-  background:var(--bg);
-  border-radius:7px;
-  overflow-wrap:anywhere;
-  min-width:0
-}
-
-.detail-label{
-  color:var(--muted);
-  font-size:12px
-}
-
-.detail-value{
-  font-size:14px;
-  font-weight:bold;
-  margin-top:5px
-}
-
-/* केवल पंचांग, चंद्र राशि और अवकहड़ा सूची का लेआउट */
-.details-list{
-  display:flex;
-  flex-direction:column;
-  gap:0
-}
-
-.detail-line{
-  display:flex;
-  flex-wrap:wrap;
-  align-items:baseline;
-  gap:5px;
-  padding:9px 2px;
-  border-bottom:1px solid #e6d4bf;
-  font-size:14px;
-  line-height:1.5;
-  overflow-wrap:anywhere
-}
-
-.detail-line:last-child{
-  border-bottom:none
-}
-
-.detail-line .detail-label{
-  color:var(--muted);
-  font-size:14px;
-  flex-shrink:0
-}
-
-.detail-line .detail-value{
-  font-size:14px;
-  font-weight:bold;
-  margin-top:0
-}
-
-@media(max-width:360px){
-  .datetime-controls{gap:5px}
-  .datetime-controls input{
-    font-size:12px;
-    padding:8px 2px
-  }
-  .apply-btn{
-    padding:9px 10px;
-    font-size:13px
-  }
-  .details-section{padding:10px}
-  .details-grid{gap:6px}
-  .detail-item{padding:7px}
-  .detail-value{font-size:13px}
-}
+.details-section{margin-top:22px;padding:14px;border:1px solid var(--line);border-radius:10px;background:#fffdf8}
+.details-section h3{text-align:center;color:var(--line);font-size:18px;margin:0 0 12px}
+.details-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.detail-item{padding:10px;background:var(--bg);border-radius:7px;overflow-wrap:anywhere;min-width:0}
+.detail-label{color:var(--muted);font-size:12px}
+.detail-value{font-size:14px;font-weight:bold;margin-top:5px}
+/* केवल संयुक्त सूची की सीधी alignment */
+.details-list{display:flex;flex-direction:column;gap:0;width:100%}
+.detail-line{display:grid;grid-template-columns:minmax(0,43%) minmax(0,57%);align-items:baseline;column-gap:0;padding:9px 2px;border-bottom:1px solid #e6d4bf;font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+.detail-line:last-child{border-bottom:none}
+.detail-line .detail-label{color:var(--muted);font-size:14px;min-width:0;overflow-wrap:anywhere}
+.detail-line .detail-value{font-size:14px;font-weight:bold;margin:0;min-width:0;overflow-wrap:anywhere}
+@media(max-width:360px){.datetime-controls{gap:5px}.datetime-controls input{font-size:12px;padding:8px 2px}.apply-btn{padding:9px 10px;font-size:13px}.details-section{padding:10px}.details-grid{gap:6px}.detail-item{padding:7px}.detail-value{font-size:13px}.detail-line{grid-template-columns:minmax(0,43%) minmax(0,57%);font-size:13px}.detail-line .detail-label,.detail-line .detail-value{font-size:13px}}
 </style>
 </head>
-
 <body>
-
 <h2>Live Vedic Kundli</h2>
 <div id="time">गणना हो रही है…</div>
-
-<div class="live-now-row">
-  <button type="button" class="apply-btn" id="liveNow">Live Now</button>
-</div>
-
+<div class="live-now-row"><button type="button" class="apply-btn" id="liveNow">Live Now</button></div>
 <div class="datetime-controls">
-  <label>
-    Date / तारीख
-    <input type="date" id="chartDate">
-  </label>
-
-  <label>
-    Time / समय
-    <input type="time" id="chartTime" step="60">
-  </label>
-
-  <button type="button" class="apply-btn" id="applyDateTime">
-    Apply
-  </button>
+<label>Date / तारीख<input type="date" id="chartDate"></label>
+<label>Time / समय<input type="time" id="chartTime" step="60"></label>
+<button type="button" class="apply-btn" id="applyDateTime">Apply</button>
 </div>
-
 <div class="rotate-controls">
-  <button type="button" class="rotate-btn" id="leftRotate">
-    ← Left Rotate
-  </button>
-  <button type="button" class="rotate-btn" id="rightRotate">
-    Right Rotate →
-  </button>
+<button type="button" class="rotate-btn" id="leftRotate">← Left Rotate</button>
+<button type="button" class="rotate-btn" id="rightRotate">Right Rotate →</button>
 </div>
-
 <svg id="chart" viewBox="0 0 400 400" aria-label="दिल्ली की लग्न कुंडली">
-  <rect class="frame" x="2" y="2" width="396" height="396"/>
-  <path class="frame" d="M2 2L398 398 M398 2L2 398 M200 2L398 200L200 398L2 200Z"/>
-  <g id="labels"></g>
-</svg>
-
+<rect class="frame" x="2" y="2" width="396" height="396"/>
+<path class="frame" d="M2 2L398 398 M398 2L2 398 M200 2L398 200L200 398L2 200Z"/>
+<g id="labels"></g></svg>
 <div id="status">ग्रहों की स्थिति लोड हो रही है…</div>
-
-<table>
-  <thead>
-    <tr>
-      <th>ग्रह</th>
-      <th>राशि</th>
-      <th>डिग्री</th>
-    </tr>
-  </thead>
-  <tbody id="rows"></tbody>
-</table>
-
-<!-- जन्म विवरण पहले जैसा -->
+<table><thead><tr><th>ग्रह</th><th>राशि</th><th>डिग्री</th></tr></thead><tbody id="rows"></tbody></table>
 <section class="details-section">
-  <h3>जन्म विवरण / Birth Details</h3>
-  <div class="details-grid">
-    <div class="detail-item">
-      <div class="detail-label">जन्म तारीख</div>
-      <div class="detail-value" id="birthDate">—</div>
-    </div>
-    <div class="detail-item">
-      <div class="detail-label">जन्म समय (IST)</div>
-      <div class="detail-value" id="birthTime">—</div>
-    </div>
-    <div class="detail-item">
-      <div class="detail-label">जन्म स्थान</div>
-      <div class="detail-value">दिल्ली, भारत</div>
-    </div>
-    <div class="detail-item">
-      <div class="detail-label">लग्न राशि</div>
-      <div class="detail-value" id="birthLagna">—</div>
-    </div>
-  </div>
-</section>
-
-<!-- पंचांग, चंद्र राशि और अवकहड़ा की संयुक्त सूची -->
+<h3>जन्म विवरण / Birth Details</h3>
+<div class="details-grid">
+<div class="detail-item"><div class="detail-label">जन्म तारीख</div><div class="detail-value" id="birthDate">—</div></div>
+<div class="detail-item"><div class="detail-label">जन्म समय (IST)</div><div class="detail-value" id="birthTime">—</div></div>
+<div class="detail-item"><div class="detail-label">जन्म स्थान</div><div class="detail-value">दिल्ली, भारत</div></div>
+<div class="detail-item"><div class="detail-label">लग्न राशि</div><div class="detail-value" id="birthLagna">—</div></div>
+</div></section>
 <section class="details-section">
-  <h3>पंचांग, चंद्र राशि एवं अवकहड़ा चक्र</h3>
-
-  <div class="details-list">
-
-    <div class="detail-line">
-      <span class="detail-label">लग्न राशि</span> -
-      <span class="detail-value" id="listLagna">—</span>
-    </div>
-
-    <div class="detail-line">
-      <span class="detail-label">वार</span> -
-      <span class="detail-value" id="pWeekday">—</span>
-    </div>
-
-    <div class="detail-line">
-      <span class="detail-label">तिथि</span> -
-      <span class="detail-value" id="pTithi">—</span>
-    </div>
-
-    <div class="detail-line">
-      <span class="detail-label">पक्ष</span> -
-      <span class="detail-value" id="pPaksha">—</span>
-    </div>
-
-    <div class="detail-line">
-      <span class="detail-label">नक्षत्र</span> -
-      <span class="detail-value" id="pNakshatra">—</span>
-      <span class="detail-value" id="listNakshatraPada">—</span>
-    </div>
-
-    <div class="detail-line">
-      <span class="detail-label">योग</span> -
-      <span class="detail-value" id="pYoga">—</span>
-    </div>
-
-    <div class="detail-line">
-      <span class="detail-label">करण</span> -
-      <span class="detail-value" id="pKarana">—</span>
-    </div>
-
-    <div class="detail-line">
-      <span class="detail-label">चंद्र राशि</span> -
-      <span class="detail-value" id="moonRashi">—</span>
-    </div>
-
-    <div class="detail-line">
-      <span class="detail-label">राशि स्वामी</span> -
-      <span class="detail-value" id="moonRashiLord">—</span>
-    </div>
-
-    <div class="detail-line">
-      <span class="detail-label">चंद्रमा की डिग्री</span> -
-      <span class="detail-value" id="moonDegree">—</span>
-    </div>
-
-    <div class="detail-line">
-      <span class="detail-label">नक्षत्र स्वामी</span> -
-      <span class="detail-value" id="nakshatraLord">—</span>
-    </div>
-
-    <div class="detail-line">
-      <span class="detail-label">वर्ण</span> -
-      <span class="detail-value" id="avVarna">—</span>
-    </div>
-
-    <div class="detail-line">
-      <span class="detail-label">वश्य</span> -
-      <span class="detail-value" id="avVashya">—</span>
-    </div>
-
-    <div class="detail-line">
-      <span class="detail-label">योनि</span> -
-      <span class="detail-value" id="avYoni">—</span>
-    </div>
-
-    <div class="detail-line">
-      <span class="detail-label">गण</span> -
-      <span class="detail-value" id="avGana">—</span>
-    </div>
-
-    <div class="detail-line">
-      <span class="detail-label">नाड़ी</span> -
-      <span class="detail-value" id="avNadi">—</span>
-    </div>
-
-    <div class="detail-line">
-      <span class="detail-label">अवकहड़ा राशि</span> -
-      <span class="detail-value" id="avRashi">—</span>
-    </div>
-
-    <div class="detail-line">
-      <span class="detail-label">अवकहड़ा राशि स्वामी</span> -
-      <span class="detail-value" id="avRashiLord">—</span>
-    </div>
-
-    <div class="detail-line">
-      <span class="detail-label">अवकहड़ा नक्षत्र</span> -
-      <span class="detail-value" id="avNakshatra">—</span>
-    </div>
-
-    <div class="detail-line">
-      <span class="detail-label">अवकहड़ा नक्षत्र स्वामी</span> -
-      <span class="detail-value" id="avNakshatraLord">—</span>
-    </div>
-
-    <div class="detail-line">
-      <span class="detail-label">चरण</span> -
-      <span class="detail-value" id="avPada">—</span>
-    </div>
-
-    <div class="detail-line">
-      <span class="detail-label">नाम अक्षर</span> -
-      <span class="detail-value" id="avAkshar">—</span>
-    </div>
-
-  </div>
-
-  <!-- मौजूदा JavaScript के पुराने IDs सुरक्षित रखने के लिए -->
-  <div hidden>
-    <span id="birthNakshatra">—</span>
-    <span id="nakshatraPada">—</span>
-    <span id="nakshatraAkshar">—</span>
-  </div>
+<h3>पंचांग, चंद्र राशि एवं अवकहड़ा चक्र</h3>
+<div class="details-list">
+<div class="detail-line"><span class="detail-label">लग्न राशि</span><span class="detail-value" id="listLagna">—</span></div>
+<div class="detail-line"><span class="detail-label">वार</span><span class="detail-value" id="pWeekday">—</span></div>
+<div class="detail-line"><span class="detail-label">तिथि</span><span class="detail-value" id="pTithi">—</span></div>
+<div class="detail-line"><span class="detail-label">पक्ष</span><span class="detail-value" id="pPaksha">—</span></div>
+<div class="detail-line"><span class="detail-label">नक्षत्र</span><span class="detail-value"><span id="pNakshatra">—</span><span id="listNakshatraPada"> —</span></span></div>
+<div class="detail-line"><span class="detail-label">योग</span><span class="detail-value" id="pYoga">—</span></div>
+<div class="detail-line"><span class="detail-label">करण</span><span class="detail-value" id="pKarana">—</span></div>
+<div class="detail-line"><span class="detail-label">चंद्र राशि</span><span class="detail-value" id="moonRashi">—</span></div>
+<div class="detail-line"><span class="detail-label">राशि स्वामी</span><span class="detail-value" id="moonRashiLord">—</span></div>
+<div class="detail-line"><span class="detail-label">चंद्रमा की डिग्री</span><span class="detail-value" id="moonDegree">—</span></div>
+<div class="detail-line"><span class="detail-label">नक्षत्र स्वामी</span><span class="detail-value" id="nakshatraLord">—</span></div>
+<div class="detail-line"><span class="detail-label">वर्ण</span><span class="detail-value" id="avVarna">—</span></div>
+<div class="detail-line"><span class="detail-label">वश्य</span><span class="detail-value" id="avVashya">—</span></div>
+<div class="detail-line"><span class="detail-label">योनि</span><span class="detail-value" id="avYoni">—</span></div>
+<div class="detail-line"><span class="detail-label">गण</span><span class="detail-value" id="avGana">—</span></div>
+<div class="detail-line"><span class="detail-label">नाड़ी</span><span class="detail-value" id="avNadi">—</span></div>
+<div class="detail-line"><span class="detail-label">अवकहड़ा राशि</span><span class="detail-value" id="avRashi">—</span></div>
+<div class="detail-line"><span class="detail-label">अवकहड़ा राशि स्वामी</span><span class="detail-value" id="avRashiLord">—</span></div>
+<div class="detail-line"><span class="detail-label">अवकहड़ा नक्षत्र</span><span class="detail-value" id="avNakshatra">—</span></div>
+<div class="detail-line"><span class="detail-label">अवकहड़ा नक्षत्र स्वामी</span><span class="detail-value" id="avNakshatraLord">—</span></div>
+<div class="detail-line"><span class="detail-label">चरण</span><span class="detail-value" id="avPada">—</span></div>
+<div class="detail-line"><span class="detail-label">नाम अक्षर</span><span class="detail-value" id="avAkshar">—</span></div>
+<div class="detail-line"><span class="detail-label">पाया</span><span class="detail-value" id="avPaya">—</span></div>
+</div>
+<div hidden><span id="birthNakshatra">—</span><span id="nakshatraPada">—</span><span id="nakshatraAkshar">—</span></div>
 </section>
-
 <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
-
 <script>
-const signs=[
-  "मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या",
-  "तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"
-];
-
-const signLords=[
-  "मंगल","शुक्र","बुध","चंद्र","सूर्य","बुध",
-  "शुक्र","मंगल","गुरु","शनि","शनि","गुरु"
-];
-
-const planets=[
-  ["Sun","सूर्य","#c17b16"],
-  ["Moon","चंद्र","#8060b8"],
-  ["Mercury","बुध","#526ed6"],
-  ["Venus","शुक्र","#d84b70"],
-  ["Mars","मंगल","#d94c54"],
-  ["Jupiter","गुरु","#a77917"],
-  ["Saturn","शनि","#777064"]
-];
-
-const DELHI_LAT=28.6139;
-const DELHI_LON=77.2090;
-
-let rotationOffset=0;
-let selectedDateTime=null;
-
-const positions=[
-  [200,55],[105,60],[45,120],[105,200],
-  [45,285],[105,345],[200,345],[295,345],
-  [355,285],[295,200],[355,120],[295,60]
-];
-
-const weekdays=[
-  "रविवार","सोमवार","मंगलवार","बुधवार",
-  "गुरुवार","शुक्रवार","शनिवार"
-];
-
-const tithis=[
-  "प्रतिपदा","द्वितीया","तृतीया","चतुर्थी","पंचमी",
-  "षष्ठी","सप्तमी","अष्टमी","नवमी","दशमी",
-  "एकादशी","द्वादशी","त्रयोदशी","चतुर्दशी","पूर्णिमा"
-];
-
-const nakshatras=[
-  "अश्विनी","भरणी","कृत्तिका","रोहिणी","मृगशिरा",
-  "आर्द्रा","पुनर्वसु","पुष्य","आश्लेषा","मघा",
-  "पूर्वा फाल्गुनी","उत्तरा फाल्गुनी","हस्त","चित्रा",
-  "स्वाती","विशाखा","अनुराधा","ज्येष्ठा","मूल",
-  "पूर्वाषाढ़ा","उत्तराषाढ़ा","श्रवण","धनिष्ठा",
-  "शतभिषा","पूर्वा भाद्रपद","उत्तरा भाद्रपद","रेवती"
-];
-
-const nakshatraLords=[
-  "केतु","शुक्र","सूर्य","चंद्र","मंगल","राहु","गुरु","शनि","बुध",
-  "केतु","शुक्र","सूर्य","चंद्र","मंगल","राहु","गुरु","शनि","बुध",
-  "केतु","शुक्र","सूर्य","चंद्र","मंगल","राहु","गुरु","शनि","बुध"
-];
-
-// प्रत्येक नक्षत्र के चार चरणों के पारंपरिक नाम अक्षर
-const nakshatraSyllables=[
-  ["चू","चे","चो","ला"],
-  ["ली","लू","ले","लो"],
-  ["अ","ई","उ","ए"],
-  ["ओ","वा","वी","वू"],
-  ["वे","वो","का","की"],
-  ["कू","घ","ङ","छ"],
-  ["के","को","हा","ही"],
-  ["हू","हे","हो","डा"],
-  ["डी","डू","डे","डो"],
-  ["मा","मी","मू","मे"],
-  ["मो","टा","टी","टू"],
-  ["टे","टो","पा","पी"],
-  ["पू","ष","ण","ठ"],
-  ["पे","पो","रा","री"],
-  ["रू","रे","रो","ता"],
-  ["ती","तू","ते","तो"],
-  ["ना","नी","नू","ने"],
-  ["नो","या","यी","यू"],
-  ["ये","यो","भा","भी"],
-  ["भू","धा","फा","ढा"],
-  ["भे","भो","जा","जी"],
-  ["खी","खू","खे","खो"],
-  ["गा","गी","गू","गे"],
-  ["गो","सा","सी","सू"],
-  ["से","सो","दा","दी"],
-  ["दू","थ","झ","ञ"],
-  ["दे","दो","चा","ची"]
-];
-
-const yogas=[
-  "विष्कुम्भ","प्रीति","आयुष्मान","सौभाग्य","शोभन",
-  "अतिगण्ड","सुकर्मा","धृति","शूल","गण्ड",
-  "वृद्धि","ध्रुव","व्याघात","हर्षण","वज्र",
-  "सिद्धि","व्यतीपात","वरीयान","परिघ","शिव",
-  "सिद्ध","साध्य","शुभ","शुक्ल","ब्रह्म",
-  "इन्द्र","वैधृति"
-];
-
-const karanas=[
-  "बव","बालव","कौलव","तैतिल","गर","वणिज","विष्टि"
-];
-
-// नक्षत्र क्रम: योनि, गण, नाड़ी
-const nakshatraTraits=[
-  ["घोड़ा","देव","आदि"],
-  ["हाथी","मनुष्य","मध्य"],
-  ["भेड़","राक्षस","अन्त्य"],
-  ["सर्प","मनुष्य","अन्त्य"],
-  ["सर्प","देव","मध्य"],
-  ["कुत्ता","मनुष्य","आदि"],
-  ["बिल्ली","देव","आदि"],
-  ["भेड़","देव","मध्य"],
-  ["बिल्ली","राक्षस","अन्त्य"],
-  ["चूहा","राक्षस","अन्त्य"],
-  ["चूहा","मनुष्य","मध्य"],
-  ["गाय","मनुष्य","आदि"],
-  ["भैंस","देव","आदि"],
-  ["बाघ","राक्षस","मध्य"],
-  ["भैंस","देव","अन्त्य"],
-  ["बाघ","राक्षस","अन्त्य"],
-  ["हिरण","देव","मध्य"],
-  ["हिरण","राक्षस","आदि"],
-  ["कुत्ता","राक्षस","आदि"],
-  ["वानर","मनुष्य","मध्य"],
-  ["नेवला","मनुष्य","अन्त्य"],
-  ["वानर","देव","अन्त्य"],
-  ["सिंह","राक्षस","मध्य"],
-  ["घोड़ा","राक्षस","आदि"],
-  ["सिंह","मनुष्य","आदि"],
-  ["गाय","मनुष्य","मध्य"],
-  ["हाथी","देव","अन्त्य"]
-];
-
-const yogasNames=yogas;
-
-function getDelhiDateTime(){
-  const parts=new Intl.DateTimeFormat("en-GB",{
-    timeZone:"Asia/Kolkata",
-    year:"numeric",
-    month:"2-digit",
-    day:"2-digit",
-    hour:"2-digit",
-    minute:"2-digit",
-    hourCycle:"h23"
-  }).formatToParts(new Date());
-
-  const v={};
-  parts.forEach(p=>v[p.type]=p.value);
-
-  return {
-    date:`${v.year}-${v.month}-${v.day}`,
-    time:`${v.hour}:${v.minute}`
-  };
-}
-
-function setDateTimeInputs(){
-  const dt=getDelhiDateTime();
-  document.getElementById("chartDate").value=dt.date;
-  document.getElementById("chartTime").value=dt.time;
-}
-
-function updateLiveClock(){
-  if(selectedDateTime!==null)return;
-
-  document.getElementById("time").textContent=
-    "कुंडली समय (दिल्ली): "+
-    new Intl.DateTimeFormat("en-IN",{
-      timeZone:"Asia/Kolkata",
-      dateStyle:"medium",
-      timeStyle:"medium"
-    }).format(new Date());
-}
-
+const signs=["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
+const signLords=["मंगल","शुक्र","बुध","चंद्र","सूर्य","बुध","शुक्र","मंगल","गुरु","शनि","शनि","गुरु"];
+const planets=[["Sun","सूर्य","#c17b16"],["Moon","चंद्र","#8060b8"],["Mercury","बुध","#526ed6"],["Venus","शुक्र","#d84b70"],["Mars","मंगल","#d94c54"],["Jupiter","गुरु","#a77917"],["Saturn","शनि","#777064"]];
+const DELHI_LAT=28.6139, DELHI_LON=77.2090;
+let rotationOffset=0, selectedDateTime=null;
+const positions=[[200,55],[105,60],[45,120],[105,200],[45,285],[105,345],[200,345],[295,345],[355,285],[295,200],[355,120],[295,60]];
+const weekdays=["रविवार","सोमवार","मंगलवार","बुधवार","गुरुवार","शुक्रवार","शनिवार"];
+const tithis=["प्रतिपदा","द्वितीया","तृतीया","चतुर्थी","पंचमी","षष्ठी","सप्तमी","अष्टमी","नवमी","दशमी","एकादशी","द्वादशी","त्रयोदशी","चतुर्दशी","पूर्णिमा"];
+const nakshatras=["अश्विनी","भरणी","कृत्तिका","रोहिणी","मृगशिरा","आर्द्रा","पुनर्वसु","पुष्य","आश्लेषा","मघा","पूर्वा फाल्गुनी","उत्तरा फाल्गुनी","हस्त","चित्रा","स्वाती","विशाखा","अनुराधा","ज्येष्ठा","मूल","पूर्वाषाढ़ा","उत्तराषाढ़ा","श्रवण","धनिष्ठा","शतभिषा","पूर्वा भाद्रपद","उत्तरा भाद्रपद","रेवती"];
+const nakshatraLords=["केतु","शुक्र","सूर्य","चंद्र","मंगल","राहु","गुरु","शनि","बुध","केतु","शुक्र","सूर्य","चंद्र","मंगल","राहु","गुरु","शनि","बुध","केतु","शुक्र","सूर्य","चंद्र","मंगल","राहु","गुरु","शनि","बुध"];
+const nakshatraSyllables=[["चू","चे","चो","ला"],["ली","लू","ले","लो"],["अ","ई","उ","ए"],["ओ","वा","वी","वू"],["वे","वो","का","की"],["कू","घ","ङ","छ"],["के","को","हा","ही"],["हू","हे","हो","डा"],["डी","डू","डे","डो"],["मा","मी","मू","मे"],["मो","टा","टी","टू"],["टे","टो","पा","पी"],["पू","ष","ण","ठ"],["पे","पो","रा","री"],["रू","रे","रो","ता"],["ती","तू","ते","तो"],["ना","नी","नू","ने"],["नो","या","यी","यू"],["ये","यो","भा","भी"],["भू","धा","फा","ढा"],["भे","भो","जा","जी"],["खी","खू","खे","खो"],["गा","गी","गू","गे"],["गो","सा","सी","सू"],["से","सो","दा","दी"],["दू","थ","झ","ञ"],["दे","दो","चा","ची"]];
+const yogas=["विष्कुम्भ","प्रीति","आयुष्मान","सौभाग्य","शोभन","अतिगण्ड","सुकर्मा","धृति","शूल","गण्ड","वृद्धि","ध्रुव","व्याघात","हर्षण","वज्र","सिद्धि","व्यतीपात","वरीयान","परिघ","शिव","सिद्ध","साध्य","शुभ","शुक्ल","ब्रह्म","इन्द्र","वैधृति"];
+const karanas=["बव","बालव","कौलव","तैतिल","गर","वणिज","विष्टि"];
+const nakshatraTraits=[["घोड़ा","देव","आदि"],["हाथी","मनुष्य","मध्य"],["भेड़","राक्षस","अन्त्य"],["सर्प","मनुष्य","अन्त्य"],["सर्प","देव","मध्य"],["कुत्ता","मनुष्य","आदि"],["बिल्ली","देव","आदि"],["भेड़","देव","मध्य"],["बिल्ली","राक्षस","अन्त्य"],["चूहा","राक्षस","अन्त्य"],["चूहा","मनुष्य","मध्य"],["गाय","मनुष्य","आदि"],["भैंस","देव","आदि"],["बाघ","राक्षस","मध्य"],["भैंस","देव","अन्त्य"],["बाघ","राक्षस","अन्त्य"],["हिरण","देव","मध्य"],["हिरण","राक्षस","आदि"],["कुत्ता","राक्षस","आदि"],["वानर","मनुष्य","मध्य"],["नेवला","मनुष्य","अन्त्य"],["वानर","देव","अन्त्य"],["सिंह","राक्षस","मध्य"],["घोड़ा","राक्षस","आदि"],["सिंह","मनुष्य","आदि"],["गाय","मनुष्य","मध्य"],["हाथी","देव","अन्त्य"]];
+function getDelhiDateTime(){const parts=new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(new Date());const v={};parts.forEach(p=>v[p.type]=p.value);return {date:`${v.year}-${v.month}-${v.day}`,time:`${v.hour}:${v.minute}`}}
+function setDateTimeInputs(){const dt=getDelhiDateTime();document.getElementById("chartDate").value=dt.date;document.getElementById("chartTime").value=dt.time}
+function updateLiveClock(){if(selectedDateTime!==null)return;document.getElementById("time").textContent="कुंडली समय (दिल्ली): "+new Intl.DateTimeFormat("en-IN",{timeZone:"Asia/Kolkata",dateStyle:"medium",timeStyle:"medium"}).format(new Date())}
 setDateTimeInputs();
-
-document.getElementById("leftRotate").addEventListener("click",()=>{
-  rotationOffset=(rotationOffset+1)%12;
-  calc();
-});
-
-document.getElementById("rightRotate").addEventListener("click",()=>{
-  rotationOffset=(rotationOffset+11)%12;
-  calc();
-});
-
-document.getElementById("applyDateTime").addEventListener("click",()=>{
-  const dateValue=document.getElementById("chartDate").value;
-  const timeValue=document.getElementById("chartTime").value;
-
-  if(!dateValue||!timeValue){
-    document.getElementById("status").textContent=
-      "कृपया तारीख और समय दोनों चुनें।";
-    return;
-  }
-
-  const chosen=new Date(`${dateValue}T${timeValue}:00+05:30`);
-
-  if(Number.isNaN(chosen.getTime())){
-    document.getElementById("status").textContent=
-      "तारीख या समय सही नहीं है।";
-    return;
-  }
-
-  selectedDateTime=chosen;
-  calc();
-});
-
-document.getElementById("liveNow").addEventListener("click",()=>{
-  selectedDateTime=null;
-  setDateTimeInputs();
-  calc();
-});
-
-function ayanamsha(date){
-  const y=date.getUTCFullYear()+
-    (date.getUTCMonth()+0.5)/12;
-  const t=(y-2000)/100;
-
-  return 23.853055+
-    1.3969713*t+
-    0.0003086*t*t;
+document.getElementById("leftRotate").addEventListener("click",()=>{rotationOffset=(rotationOffset+1)%12;calc()});
+document.getElementById("rightRotate").addEventListener("click",()=>{rotationOffset=(rotationOffset+11)%12;calc()});
+document.getElementById("applyDateTime").addEventListener("click",()=>{const dateValue=document.getElementById("chartDate").value,timeValue=document.getElementById("chartTime").value;if(!dateValue||!timeValue){document.getElementById("status").textContent="कृपया तारीख और समय दोनों चुनें।";return}const chosen=new Date(`${dateValue}T${timeValue}:00+05:30`);if(Number.isNaN(chosen.getTime())){document.getElementById("status").textContent="तारीख या समय सही नहीं है।";return}selectedDateTime=chosen;calc()});
+document.getElementById("liveNow").addEventListener("click",()=>{selectedDateTime=null;setDateTimeInputs();calc()});
+function ayanamsha(date){const y=date.getUTCFullYear()+(date.getUTCMonth()+0.5)/12,t=(y-2000)/100;return 23.853055+1.3969713*t+0.0003086*t*t}
+function norm(x){return ((x%360)+360)%360}
+function degText(x){const d=Math.floor(x),m=Math.floor((x-d)*60),s=Math.floor((((x-d)*60)-m)*60);return `${d}° ${m}' ${s}"`}
+function siderealLongitude(body,date){const v=Astronomy.GeoVector(body,date,true);return norm(Astronomy.Ecliptic(v).elon-ayanamsha(date))}
+function calculateLagna(date){const jd=date.getTime()/86400000+2440587.5,T=(jd-2451545.0)/36525;const gmst=norm(280.46061837+360.98564736629*(jd-2451545.0)+0.000387933*T*T-T*T*T/38710000);const lst=norm(gmst+DELHI_LON),eps=23.439291-0.0130042*T-0.000000164*T*T+0.000000504*T*T*T;const theta=lst*Math.PI/180,e=eps*Math.PI/180,phi=DELHI_LAT*Math.PI/180;const tropical=norm(Math.atan2(Math.cos(theta),-(Math.sin(e)*Math.tan(phi)+Math.cos(e)*Math.sin(theta)))*180/Math.PI);return norm(tropical-ayanamsha(date))}
+function updateMoonAndAvakhada(moonSidereal,lagnaSign){
+ const moonSign=Math.floor(moonSidereal/30),moonDegree=moonSidereal%30,nakSize=360/27,padaSize=nakSize/4,nakIndex=Math.floor(moonSidereal/nakSize),withinNak=moonSidereal-(nakIndex*nakSize),pada=Math.min(4,Math.floor(withinNak/padaSize)+1),akshar=nakshatraSyllables[nakIndex][pada-1],traits=nakshatraTraits[nakIndex];
+ document.getElementById("moonRashi").textContent=signs[moonSign];document.getElementById("moonRashiLord").textContent=signLords[moonSign];document.getElementById("moonDegree").textContent=degText(moonDegree);
+ document.getElementById("birthNakshatra").textContent=nakshatras[nakIndex];document.getElementById("nakshatraLord").textContent=nakshatraLords[nakIndex];document.getElementById("nakshatraPada").textContent=`${pada} / 4`;document.getElementById("nakshatraAkshar").textContent=akshar;
+ document.getElementById("listNakshatraPada").textContent=`— चरण ${pada} (${akshar})`;
+ const varnaBySign=["क्षत्रिय","वैश्य","शूद्र","ब्राह्मण","क्षत्रिय","वैश्य","शूद्र","ब्राह्मण","क्षत्रिय","वैश्य","शूद्र","ब्राह्मण"];
+ const vashyaBySign=["चतुष्पद","चतुष्पद","मानव","जलचर","वनचर","मानव","मानव","कीट","चतुष्पद","चतुष्पद","मानव","जलचर"];
+ document.getElementById("avVarna").textContent=varnaBySign[moonSign];document.getElementById("avVashya").textContent=vashyaBySign[moonSign];document.getElementById("avYoni").textContent=traits[0];document.getElementById("avGana").textContent=traits[1];document.getElementById("avNadi").textContent=traits[2];document.getElementById("avRashi").textContent=signs[moonSign];document.getElementById("avRashiLord").textContent=signLords[moonSign];document.getElementById("avNakshatra").textContent=nakshatras[nakIndex];document.getElementById("avNakshatraLord").textContent=nakshatraLords[nakIndex];document.getElementById("avPada").textContent=`${pada} / 4`;document.getElementById("avAkshar").textContent=akshar;
+ // पाया: चंद्र राशि लग्न से किस भाव में है, उसके अनुसार
+ const moonHouse=((moonSign-lagnaSign+12)%12)+1;
+ let paya;
+ if([1,6,11].includes(moonHouse))paya="सोना";
+ else if([2,5,9].includes(moonHouse))paya="चाँदी";
+ else if([3,7,10].includes(moonHouse))paya="ताँबा";
+ else paya="लोहा";
+ document.getElementById("avPaya").textContent=paya;
 }
-
-function norm(x){
-  return ((x%360)+360)%360;
-}
-
-function degText(x){
-  const d=Math.floor(x);
-  const m=Math.floor((x-d)*60);
-  const s=Math.floor((((x-d)*60)-m)*60);
-
-  return `${d}° ${m}' ${s}"`;
-}
-
-function siderealLongitude(body,date){
-  const v=Astronomy.GeoVector(body,date,true);
-  return norm(Astronomy.Ecliptic(v).elon-ayanamsha(date));
-}
-
-function calculateLagna(date){
-  const jd=date.getTime()/86400000+2440587.5;
-  const T=(jd-2451545.0)/36525;
-
-  const gmst=norm(
-    280.46061837+
-    360.98564736629*(jd-2451545.0)+
-    0.000387933*T*T-
-    T*T*T/38710000
-  );
-
-  const lst=norm(gmst+DELHI_LON);
-  const eps=23.439291-
-    0.0130042*T-
-    0.000000164*T*T+
-    0.000000504*T*T*T;
-
-  const theta=lst*Math.PI/180;
-  const e=eps*Math.PI/180;
-  const phi=DELHI_LAT*Math.PI/180;
-
-  const tropical=norm(
-    Math.atan2(
-      Math.cos(theta),
-      -(Math.sin(e)*Math.tan(phi)+
-        Math.cos(e)*Math.sin(theta))
-    )*180/Math.PI
-  );
-
-  return norm(tropical-ayanamsha(date));
-}
-
-// चंद्र राशि, नक्षत्र, चरण और अवकहड़ा चक्र
-function updateMoonAndAvakhada(moonSidereal){
-  const moonSign=Math.floor(moonSidereal/30);
-  const moonDegree=moonSidereal%30;
-
-  const nakSize=360/27;
-  const padaSize=nakSize/4;
-  const nakIndex=Math.floor(moonSidereal/nakSize);
-  const withinNak=moonSidereal-(nakIndex*nakSize);
-  const pada=Math.min(4,Math.floor(withinNak/padaSize)+1);
-  const akshar=nakshatraSyllables[nakIndex][pada-1];
-  const traits=nakshatraTraits[nakIndex];
-
-  document.getElementById("moonRashi").textContent=signs[moonSign];
-  document.getElementById("moonRashiLord").textContent=signLords[moonSign];
-  document.getElementById("moonDegree").textContent=degText(moonDegree);
-
-  document.getElementById("birthNakshatra").textContent=nakshatras[nakIndex];
-  document.getElementById("nakshatraLord").textContent=nakshatraLords[nakIndex];
-  document.getElementById("nakshatraPada").textContent=`${pada} / 4`;
-  document.getElementById("nakshatraAkshar").textContent=akshar;
-
-  // नक्षत्र के सामने चरण और अक्षर ब्रैकेट में
-  document.getElementById("listNakshatraPada").textContent=
-    `- चरण ${pada} (${akshar})`;
-
-  // अवकहड़ा चक्र के पारंपरिक गुण
-  const varnaBySign=[
-    "क्षत्रिय","वैश्य","शूद्र","ब्राह्मण",
-    "क्षत्रिय","वैश्य","शूद्र","ब्राह्मण",
-    "क्षत्रिय","वैश्य","शूद्र","ब्राह्मण"
-  ];
-
-  const vashyaBySign=[
-    "चतुष्पद","चतुष्पद","मानव",
-    "जलचर","वनचर","मानव",
-    "मानव","कीट","चतुष्पद",
-    "चतुष्पद","मानव","जलचर"
-  ];
-
-  document.getElementById("avVarna").textContent=varnaBySign[moonSign];
-  document.getElementById("avVashya").textContent=vashyaBySign[moonSign];
-  document.getElementById("avYoni").textContent=traits[0];
-  document.getElementById("avGana").textContent=traits[1];
-  document.getElementById("avNadi").textContent=traits[2];
-  document.getElementById("avRashi").textContent=signs[moonSign];
-  document.getElementById("avRashiLord").textContent=signLords[moonSign];
-  document.getElementById("avNakshatra").textContent=nakshatras[nakIndex];
-  document.getElementById("avNakshatraLord").textContent=nakshatraLords[nakIndex];
-  document.getElementById("avPada").textContent=`${pada} / 4`;
-  document.getElementById("avAkshar").textContent=akshar;
-}
-
 function updateBirthAndPanchang(date,lagnaSign,lagnaDegree){
-  const dateOptions={
-    timeZone:"Asia/Kolkata",
-    day:"2-digit",
-    month:"long",
-    year:"numeric"
-  };
-
-  const timeOptions={
-    timeZone:"Asia/Kolkata",
-    hour:"2-digit",
-    minute:"2-digit",
-    hour12:true
-  };
-
-  document.getElementById("birthDate").textContent=
-    new Intl.DateTimeFormat("hi-IN",dateOptions).format(date);
-
-  document.getElementById("birthTime").textContent=
-    new Intl.DateTimeFormat("hi-IN",timeOptions).format(date);
-
-  document.getElementById("birthLagna").textContent=
-    signs[lagnaSign]+" "+degText(lagnaDegree);
-
-  // सूची में सबसे ऊपर लग्न राशि
-  document.getElementById("listLagna").textContent=
-    signs[lagnaSign]+" "+degText(lagnaDegree);
-
-  const weekdayName=new Intl.DateTimeFormat("en-US",{
-    timeZone:"Asia/Kolkata",
-    weekday:"short"
-  }).format(date);
-
-  const weekdayIndex={
-    Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6
-  }[weekdayName] ?? 0;
-
-  document.getElementById("pWeekday").textContent=
-    weekdays[weekdayIndex];
-
-  const sunTropical=Astronomy.Ecliptic(
-    Astronomy.GeoVector(Astronomy.Body.Sun,date,true)
-  ).elon;
-
-  const moonTropical=Astronomy.Ecliptic(
-    Astronomy.GeoVector(Astronomy.Body.Moon,date,true)
-  ).elon;
-
-  const ayan=ayanamsha(date);
-  const sunSidereal=norm(sunTropical-ayan);
-  const moonSidereal=norm(moonTropical-ayan);
-
-  const elongation=norm(moonTropical-sunTropical);
-  const tithiIndex=Math.min(29,Math.floor(elongation/12));
-
-  let tithiName;
-
-  if(tithiIndex===14){
-    tithiName="पूर्णिमा";
-  }else if(tithiIndex===29){
-    tithiName="अमावस्या";
-  }else{
-    tithiName=tithis[tithiIndex%15];
-  }
-
-  document.getElementById("pTithi").textContent=tithiName;
-
-  document.getElementById("pPaksha").textContent=
-    elongation<180 ? "शुक्ल पक्ष" : "कृष्ण पक्ष";
-
-  const nakIndex=Math.floor(moonSidereal/(360/27))%27;
-
-  document.getElementById("pNakshatra").textContent=
-    nakshatras[nakIndex];
-
-  const yogaIndex=Math.floor(
-    norm(sunSidereal+moonSidereal)/(360/27)
-  )%27;
-
-  document.getElementById("pYoga").textContent=
-    yogasNames[yogaIndex];
-
-  const karanaIndex=Math.floor(elongation/6)%60;
-  let karanaName;
-
-  if(karanaIndex===0){
-    karanaName="किंस्तुघ्न";
-  }else if(karanaIndex>=57){
-    karanaName=["शकुनि","चतुष्पद","नाग"][karanaIndex-57];
-  }else{
-    karanaName=karanas[(karanaIndex-1)%7];
-  }
-
-  document.getElementById("pKarana").textContent=karanaName;
-
-  updateMoonAndAvakhada(moonSidereal);
+ const dateOptions={timeZone:"Asia/Kolkata",day:"2-digit",month:"long",year:"numeric"},timeOptions={timeZone:"Asia/Kolkata",hour:"2-digit",minute:"2-digit",hour12:true};
+ document.getElementById("birthDate").textContent=new Intl.DateTimeFormat("hi-IN",dateOptions).format(date);document.getElementById("birthTime").textContent=new Intl.DateTimeFormat("hi-IN",timeOptions).format(date);document.getElementById("birthLagna").textContent=signs[lagnaSign]+" "+degText(lagnaDegree);document.getElementById("listLagna").textContent=signs[lagnaSign]+" "+degText(lagnaDegree);
+ const weekdayName=new Intl.DateTimeFormat("en-US",{timeZone:"Asia/Kolkata",weekday:"short"}).format(date),weekdayIndex={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6}[weekdayName]??0;document.getElementById("pWeekday").textContent=weekdays[weekdayIndex];
+ const sunTropical=Astronomy.Ecliptic(Astronomy.GeoVector(Astronomy.Body.Sun,date,true)).elon,moonTropical=Astronomy.Ecliptic(Astronomy.GeoVector(Astronomy.Body.Moon,date,true)).elon,ayan=ayanamsha(date),sunSidereal=norm(sunTropical-ayan),moonSidereal=norm(moonTropical-ayan),elongation=norm(moonTropical-sunTropical),tithiIndex=Math.min(29,Math.floor(elongation/12));
+ let tithiName;if(tithiIndex===14)tithiName="पूर्णिमा";else if(tithiIndex===29)tithiName="अमावस्या";else tithiName=tithis[tithiIndex%15];document.getElementById("pTithi").textContent=tithiName;document.getElementById("pPaksha").textContent=elongation<180?"शुक्ल पक्ष":"कृष्ण पक्ष";
+ const nakIndex=Math.floor(moonSidereal/(360/27))%27;document.getElementById("pNakshatra").textContent=nakshatras[nakIndex];const yogaIndex=Math.floor(norm(sunSidereal+moonSidereal)/(360/27))%27;document.getElementById("pYoga").textContent=yogas[yogaIndex];
+ const karanaIndex=Math.floor(elongation/6)%60;let karanaName;if(karanaIndex===0)karanaName="किंस्तुघ्न";else if(karanaIndex>=57)karanaName=["शकुनि","चतुष्पद","नाग"][karanaIndex-57];else karanaName=karanas[(karanaIndex-1)%7];document.getElementById("pKarana").textContent=karanaName;
+ updateMoonAndAvakhada(moonSidereal,lagnaSign);
 }
-
-function addSvgText(group,x,y,className,text,fill){
-  const el=document.createElementNS(
-    "http://www.w3.org/2000/svg","text"
-  );
-
-  el.setAttribute("x",x);
-  el.setAttribute("y",y);
-  el.setAttribute("class",className);
-
-  if(fill)el.setAttribute("fill",fill);
-
-  el.textContent=text;
-  group.appendChild(el);
-
-  return el;
-}
-
+function addSvgText(group,x,y,className,text,fill){const el=document.createElementNS("http://www.w3.org/2000/svg","text");el.setAttribute("x",x);el.setAttribute("y",y);el.setAttribute("class",className);if(fill)el.setAttribute("fill",fill);el.textContent=text;group.appendChild(el);return el}
 function calc(){
-  if(!window.Astronomy){
-    document.getElementById("status").textContent=
-      "गणना लाइब्रेरी लोड नहीं हुई। इंटरनेट जाँचकर पेज Refresh करें।";
-    return;
-  }
-
-  try{
-    const now=selectedDateTime||new Date();
-
-    document.getElementById("time").textContent=
-      "कुंडली समय (दिल्ली): "+
-      new Intl.DateTimeFormat("en-IN",{
-        timeZone:"Asia/Kolkata",
-        dateStyle:"medium",
-        timeStyle:"medium"
-      }).format(now);
-
-    const data=planets.map(([body,name,color])=>{
-      const lon=siderealLongitude(Astronomy.Body[body],now);
-
-      return {
-        name,
-        color,
-        lon,
-        sign:Math.floor(lon/30),
-        within:lon%30
-      };
-    });
-
-    const jd=now.getTime()/86400000+2440587.5;
-    const T=(jd-2451545)/36525;
-
-    const rahu=norm(
-      125.04452-
-      1934.136261*T+
-      0.0020708*T*T+
-      T*T*T/450000
-    );
-
-    const rahuLon=norm(rahu-ayanamsha(now));
-
-    data.push({
-      name:"राहु",
-      color:"#348c79",
-      lon:rahuLon,
-      sign:Math.floor(rahuLon/30),
-      within:rahuLon%30
-    });
-
-    const ketuLon=norm(rahuLon+180);
-
-    data.push({
-      name:"केतु",
-      color:"#a05bc4",
-      lon:ketuLon,
-      sign:Math.floor(ketuLon/30),
-      within:ketuLon%30
-    });
-
-    const lagnaLon=calculateLagna(now);
-    const lagnaSign=Math.floor(lagnaLon/30);
-    const lagnaDegree=lagnaLon%30;
-
-    updateBirthAndPanchang(now,lagnaSign,lagnaDegree);
-
-    const byHouse=Array.from({length:12},()=>[]);
-
-    data.forEach(p=>{
-      const house=(p.sign-lagnaSign+12)%12;
-      byHouse[house].push(p);
-    });
-
-    const g=document.getElementById("labels");
-    g.innerHTML="";
-
-    for(let house=0;house<12;house++){
-      const target=(house+rotationOffset+12)%12;
-      const [x,y]=positions[target];
-
-      const dx=x-200;
-      const dy=y-200;
-      const distance=Math.sqrt(dx*dx+dy*dy);
-
-      const move=24;
-
-      const xNew=x+(dx/distance)*move;
-      const yNew=y+(dy/distance)*move;
-
-      const signNumber=((lagnaSign+house)%12)+1;
-
-      // मूल कुंडली की पोज़िशनिंग में कोई बदलाव नहीं
-      const inwardMove = house === 6 ? 60 : 0;
-
-      const signX=xNew-(dx/distance)*inwardMove;
-      const signY=yNew-(dy/distance)*inwardMove;
-
-      addSvgText(g,signX,signY,"house",String(signNumber));
-
-      if(house===0){
-        addSvgText(
-          g,
-          signX,
-          signY+12,
-          "lagna-label",
-          "लग्न"
-        );
-      }
-
-      byHouse[house].forEach((p,j)=>{
-        const planetX=signX;
-        const planetY=signY;
-        const startY=planetY+(house===0?26:16);
-
-        addSvgText(
-          g,
-          planetX,
-          startY+j*14,
-          "planet",
-          p.name,
-          p.color
-        );
-      });
-    }
-
-    document.getElementById("rows").innerHTML=data.map(p=>
-      `<tr><td>${p.name}</td><td>${signs[p.sign]}</td><td>${degText(p.within)}</td></tr>`
-    ).join("");
-
-    document.getElementById("status").textContent=
-      `दिल्ली का लग्न: ${signs[lagnaSign]} ${degText(lagnaDegree)} · `+
-      (selectedDateTime?"चुना हुआ समय":"लाइव कुंडली")+
-      " · अनुमानित Lahiri ayanamsha";
-
-  }catch(e){
-    console.error(e);
-
-    document.getElementById("status").textContent=
-      "गणना में त्रुटि हुई। इंटरनेट और गणना लाइब्रेरी जाँचें।";
-  }
+ if(!window.Astronomy){document.getElementById("status").textContent="गणना लाइब्रेरी लोड नहीं हुई। इंटरनेट जाँचकर पेज Refresh करें।";return}
+ try{
+ const now=selectedDateTime||new Date();document.getElementById("time").textContent="कुंडली समय (दिल्ली): "+new Intl.DateTimeFormat("en-IN",{timeZone:"Asia/Kolkata",dateStyle:"medium",timeStyle:"medium"}).format(now);
+ const data=planets.map(([body,name,color])=>{const lon=siderealLongitude(Astronomy.Body[body],now);return {name,color,lon,sign:Math.floor(lon/30),within:lon%30}});
+ const jd=now.getTime()/86400000+2440587.5,T=(jd-2451545)/36525,rahu=norm(125.04452-1934.136261*T+0.0020708*T*T+T*T*T/450000),rahuLon=norm(rahu-ayanamsha(now));
+ data.push({name:"राहु",color:"#348c79",lon:rahuLon,sign:Math.floor(rahuLon/30),within:rahuLon%30});const ketuLon=norm(rahuLon+180);data.push({name:"केतु",color:"#a05bc4",lon:ketuLon,sign:Math.floor(ketuLon/30),within:ketuLon%30});
+ const lagnaLon=calculateLagna(now),lagnaSign=Math.floor(lagnaLon/30),lagnaDegree=lagnaLon%30;updateBirthAndPanchang(now,lagnaSign,lagnaDegree);
+ const byHouse=Array.from({length:12},()=>[]);data.forEach(p=>{const house=(p.sign-lagnaSign+12)%12;byHouse[house].push(p)});
+ const g=document.getElementById("labels");g.innerHTML="";
+ for(let house=0;house<12;house++){
+  const target=(house+rotationOffset+12)%12,[x,y]=positions[target],dx=x-200,dy=y-200,distance=Math.sqrt(dx*dx+dy*dy),move=24,xNew=x+(dx/distance)*move,yNew=y+(dy/distance)*move,signNumber=((lagnaSign+house)%12)+1;
+  const inwardMove=house===6?60:0,signX=xNew-(dx/distance)*inwardMove,signY=yNew-(dy/distance)*inwardMove;
+  addSvgText(g,signX,signY,"house",String(signNumber));
+  if(house===0)addSvgText(g,signX,signY+12,"lagna-label","लग्न");
+  byHouse[house].forEach((p,j)=>addSvgText(g,signX,signY+(house===0?26:16)+j*14,"planet",p.name,p.color));
+ }
+ document.getElementById("rows").innerHTML=data.map(p=>`<tr><td>${p.name}</td><td>${signs[p.sign]}</td><td>${degText(p.within)}</td></tr>`).join("");
+ document.getElementById("status").textContent=`दिल्ली का लग्न: ${signs[lagnaSign]} ${degText(lagnaDegree)} · `+(selectedDateTime?"चुना हुआ समय":"लाइव कुंडली")+" · अनुमानित Lahiri ayanamsha";
+ }catch(e){console.error(e);document.getElementById("status").textContent="गणना में त्रुटि हुई। इंटरनेट और गणना लाइब्रेरी जाँचें।"}
 }
-
-calc();
-
-setInterval(calc,60000);
-setInterval(updateLiveClock,1000);
+calc();setInterval(calc,60000);setInterval(updateLiveClock,1000);
 </script>
-
 </body>
 </html>
