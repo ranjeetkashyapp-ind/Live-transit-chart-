@@ -561,37 +561,14 @@ function updateBirthAndPanchang(date,lagnaSign,lagnaDegree){
     signs[lagnaSign]+" "+degText(lagnaDegree);
 
   /* सप्ताह का वार */
-  const weekdayIndex=Number(
-    new Intl.DateTimeFormat("en-US",{
-      timeZone:"Asia/Kolkata",
-      weekday:"short"
-    }).formatToParts(date).find(p=>p.type==="weekday")
-      ? date.toLocaleDateString("en-US",{
-          timeZone:"Asia/Kolkata",
-          weekday:"short"
-        })==="Sun" ? 0 :
-        date.toLocaleDateString("en-US",{
-          timeZone:"Asia/Kolkata",
-          weekday:"short"
-        })==="Mon" ? 1 :
-        date.toLocaleDateString("en-US",{
-          timeZone:"Asia/Kolkata",
-          weekday:"short"
-        })==="Tue" ? 2 :
-        date.toLocaleDateString("en-US",{
-          timeZone:"Asia/Kolkata",
-          weekday:"short"
-        })==="Wed" ? 3 :
-        date.toLocaleDateString("en-US",{
-          timeZone:"Asia/Kolkata",
-          weekday:"short"
-        })==="Thu" ? 4 :
-        date.toLocaleDateString("en-US",{
-          timeZone:"Asia/Kolkata",
-          weekday:"short"
-        })==="Fri" ? 5 : 6
-      : 0
-  );
+  const weekdayName=new Intl.DateTimeFormat("en-US",{
+    timeZone:"Asia/Kolkata",
+    weekday:"short"
+  }).format(date);
+
+  const weekdayIndex={
+    Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6
+  }[weekdayName] ?? 0;
 
   document.getElementById("pWeekday").textContent=
     weekdays[weekdayIndex];
@@ -759,21 +736,25 @@ function calc(){
       const dy=y-200;
       const distance=Math.sqrt(dx*dx+dy*dy);
 
-      /* राशियों की मूल पोज़िशन समान */
+      /* मूल राशि और ग्रह पोज़िशन */
       const move=24;
 
       const xNew=x+(dx/distance)*move;
       const yNew=y+(dy/distance)*move;
 
+      /* राशि नंबर को 15 यूनिट केंद्र की तरफ खिसाएँ */
+      const signX=xNew-(dx/distance)*15;
+      const signY=yNew-(dy/distance)*15;
+
       const signNumber=((lagnaSign+house)%12)+1;
 
-      addSvgText(g,xNew,yNew,"house",String(signNumber));
+      addSvgText(g,signX,signY,"house",String(signNumber));
 
       if(house===0){
         addSvgText(g,xNew,yNew+12,"lagna-label","लग्न");
       }
 
-      /* केवल ग्रहों को केंद्र की तरफ थोड़ा और खिसाया गया है */
+      /* ग्रहों को 15 यूनिट केंद्र की तरफ खिसाएँ */
       byHouse[house].forEach((p,j)=>{
         const planetX=xNew-(dx/distance)*15;
         const planetY=yNew-(dy/distance)*15;
