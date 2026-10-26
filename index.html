@@ -8,17 +8,25 @@
 :root{--bg:#fff8ed;--line:#a85d2b;--ink:#392514;--muted:#806c5b}
 *{box-sizing:border-box}
 body{margin:0;padding:16px;background:var(--bg);color:var(--ink);font-family:Arial,sans-serif}
+.brand-header{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;margin:0 auto 10px;max-width:900px}
+.brand-mark{width:62px;height:62px;border:2px solid #f07813;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#e85a0b;font-size:32px;font-weight:900;line-height:1;position:relative}
+.brand-mark:before{content:"";position:absolute;inset:5px;border:1px solid #f07813;transform:rotate(45deg)}
+.brand-name{font-size:14px;font-weight:800;color:#b83a21;text-align:center;margin-top:3px;white-space:nowrap}
+.brand-title{min-width:0;text-align:center}.brand-title h2{font-size:20px;margin:0 0 6px}.brand-email{font-size:10px;text-align:right;overflow-wrap:anywhere;color:var(--muted)}
 h2{font-size:20px;text-align:center;margin:6px 0}
 #time{text-align:center;color:var(--muted);font-size:13px;margin:8px 0 16px}
-.datetime-controls{display:flex;justify-content:center;align-items:flex-end;flex-wrap:nowrap;gap:10px;margin:0 auto 12px}
+.datetime-controls{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:end;gap:10px;margin:0 auto 10px;max-width:900px}
+.datetime-controls .apply-btn{grid-column:1/-1;width:100%;background:#ef6500;color:#fff;border-color:#c84e00;padding:12px 14px;font-size:16px}
+.location-control{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:12px;min-width:0}
+.location-control select{width:100%;min-width:0;background:#fff8ed;color:#392514;border:1px solid #a85d2b;border-radius:6px;padding:8px 4px;font-family:Arial,sans-serif;font-size:14px}
 .datetime-controls label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:12px;flex:1;min-width:0}
 .datetime-controls input{width:100%;min-width:0;background:#fff8ed;color:#392514;border:1px solid #a85d2b;border-radius:6px;padding:8px 4px;font-family:Arial,sans-serif;font-size:14px}
 .festival-btn{background:#a85d2b!important;color:#fff!important;border:2px solid #7d3e19!important;padding:12px 16px!important;font-size:15px!important;display:inline-block;max-width:100%;white-space:normal;line-height:1.4;box-shadow:0 2px 5px #0002}
 .apply-btn,.rotate-btn{background:#fff8ed;color:#392514;border:1px solid #a85d2b;border-radius:6px;padding:9px 14px;font-size:14px;font-weight:bold;cursor:pointer}
-#liveNow{display:inline-block;margin:0 auto 10px}
-.live-now-row{text-align:center;margin:0 auto}
+#liveNow{display:inline-block;margin:0 auto 10px;background:#ef6500;color:white;border-color:#c84e00;padding:10px 24px;font-size:16px}
+.live-now-row{text-align:center;margin:0 auto 10px}
 .rotate-controls{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin:0 auto 12px}
-.rotate-btn{padding:9px 16px}
+.rotate-btn{padding:11px 16px;flex:1;max-width:420px}
 .rotate-btn:active,.apply-btn:active{background:#f0dfca}
 svg{display:block;width:100%;height:auto;max-width:600px;margin:auto}
 .frame{fill:none;stroke:var(--line);stroke-width:1.5}
@@ -54,16 +62,22 @@ th{color:var(--line)}
 .detail-line:last-child{border-bottom:none}
 .detail-line .detail-label{color:var(--muted);font-size:14px;min-width:0;overflow-wrap:anywhere}
 .detail-line .detail-value{font-size:14px;font-weight:bold;margin:0;min-width:0;overflow-wrap:anywhere}
+@media(max-width:480px){body{padding:12px}.brand-header{grid-template-columns:64px minmax(0,1fr);gap:8px}.brand-email{grid-column:1/-1;text-align:center}.brand-title h2{font-size:18px}.datetime-controls{gap:6px}.datetime-controls label{font-size:11px}.datetime-controls input,.location-control select{font-size:12px;padding:8px 2px}.rotate-controls{gap:8px}.rotate-btn{font-size:12px;padding:10px 5px}}
 @media(max-width:360px){.datetime-controls{gap:5px}.datetime-controls input{font-size:12px;padding:8px 2px}.apply-btn{padding:9px 10px;font-size:13px}.details-section{padding:10px}.details-grid{gap:6px}.detail-item{padding:7px}.detail-value{font-size:13px}.detail-line{grid-template-columns:minmax(0,43%) minmax(0,57%);font-size:13px}.detail-line .detail-label,.detail-line .detail-value{font-size:13px}}
 </style>
 </head>
 <body>
-<h2>Live Vedic Kundli</h2>
-<div id="time">गणना हो रही है…</div>
+<header class="brand-header">
+<div><div class="brand-mark" aria-label="Astro Plus logo">A+</div><div class="brand-name">Astro Plus</div></div>
+<div class="brand-title"><h2>Live Vedic Kundli</h2><div id="time">गणना हो रही है…</div></div>
+<div class="brand-email">astroplus.care@gmail.com</div>
+</header>
+<div id="time-old" hidden>गणना हो रही है…</div>
 <div class="live-now-row"><button type="button" class="apply-btn" id="liveNow">Live Now</button></div>
 <div class="datetime-controls">
 <label>Date / तारीख<input type="date" id="chartDate"></label>
 <label>Time / समय<input type="time" id="chartTime" step="60"></label>
+<label class="location-control">Location / स्थान<select id="chartLocation"><option value="Delhi">Delhi</option></select></label>
 <button type="button" class="apply-btn" id="applyDateTime">Apply</button>
 </div>
 <div class="rotate-controls">
@@ -482,5 +496,6 @@ function setupAshtakoot(){
 
 setupKundliTabs();setupAshtakoot();calc();setInterval(calc,60000);setInterval(updateLiveClock,1000);
 </script>
+<footer style="text-align:center;font-size:12px;color:var(--muted);padding:18px 0 6px">Visit- astroplus.in</footer>
 </body>
 </html>
