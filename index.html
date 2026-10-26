@@ -170,11 +170,15 @@ function calc(){
   const planetBaseY = signY + (house===0 ? 26 : 16);
   const planetStepX = 13;
   const planetStepY = 16;
+  /* ग्रहों को भाव की सीमा से थोड़ा अंदर, केंद्र की ओर खिसकाएँ */
+  const labelDistance = Math.hypot(signX-200, signY-200) || 1;
+  const inwardX = ((200-signX)/labelDistance)*8;
+  const inwardY = ((200-signY)/labelDistance)*8;
   byHouse[house].forEach((p,j)=>{
     const row = Math.floor(j/2);
     const col = j%2;
-    const planetX = signX + (col===0 ? -planetStepX : planetStepX);
-    const planetY = planetBaseY + row*planetStepY;
+    const planetX = signX + inwardX + (col===0 ? -planetStepX : planetStepX);
+    const planetY = planetBaseY + inwardY + row*planetStepY;
     addSvgText(g,planetX,planetY,"planet",p.name,p.color);
   });
  }
