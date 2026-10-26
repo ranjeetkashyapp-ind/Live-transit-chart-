@@ -61,7 +61,7 @@ th{color:var(--line)}
 <path class="frame" d="M2 2L398 398 M398 2L2 398 M200 2L398 200L200 398L2 200Z"/>
 <g id="labels"></g></svg>
 <div id="status">ग्रहों की स्थिति लोड हो रही है…</div>
-<table><thead><tr><th>ग्रह</th><th>राशि</th><th>डिग्री</th></tr></thead><tbody id="rows"></tbody></table>
+<table><thead><tr><th>ग्रह</th><th>राशि</th><th>अंश</th><th>स्थिति</th></tr></thead><tbody id="rows"></tbody></table>
 <section class="details-section">
 <h3>जन्म विवरण / Birth Details</h3>
 <div class="details-grid">
@@ -151,6 +151,37 @@ function updateBirthAndPanchang(date,lagnaSign,lagnaDegree){
  updateMoonAndAvakhada(moonSidereal,lagnaSign);
 }
 function addSvgText(group,x,y,className,text,fill){const el=document.createElementNS("http://www.w3.org/2000/svg","text");el.setAttribute("x",x);el.setAttribute("y",y);el.setAttribute("class",className);if(fill)el.setAttribute("fill",fill);el.textContent=text;group.appendChild(el);return el}
+
+/* ग्रहों की गति और सूर्य से कोणीय दूरी के आधार पर स्थिति का अनुमान */
+function getPlanetStatus(p, now, sunSidereal) {
+  if (p.name === "सूर्य") return "—";
+  if (p.name === "राहु" || p.name === "केतु") return "वक्री";
+
+  const bodyName = planets.find(x => x[1] === p.name)?.[0];
+  if (!bodyName) return "—";
+
+  const body = Astronomy.Body[bodyName];
+  const tomorrow = new Date(now.getTime() + 86400000);
+  const lon1 = siderealLongitude(body, now);
+  const lon2 = siderealLongitude(body, tomorrow);
+  let speed = norm(lon2 - lon1);
+  if (speed > 180) speed -= 360;
+
+  const separationRaw = norm(p.lon - sunSidereal);
+  const separation = separationRaw > 180 ? 360 - separationRaw : separationRaw;
+  const limits = {
+    "चंद्र": 12,
+    "मंगल": 17,
+    "बुध": 14,
+    "गुरु": 11,
+    "शुक्र": 10,
+    "शनि": 15
+  };
+  const motion = speed < 0 ? "वक्री" : "मार्गी";
+  if (separation < (limits[p.name] || 10)) return motion + " · अस्त";
+  return motion + " · उदय";
+}
+
 function calc(){
  if(!window.Astronomy){document.getElementById("status").textContent="गणना लाइब्रेरी लोड नहीं हुई। इंटरनेट जाँचकर पेज Refresh करें।";return}
  try{
@@ -182,7 +213,8 @@ function calc(){
     addSvgText(g,planetX,planetY,"planet",p.name,p.color);
   });
  }
- document.getElementById("rows").innerHTML=data.map(p=>`<tr><td>${p.name}</td><td>${signs[p.sign]}</td><td>${degText(p.within)}</td></tr>`).join("");
+ const sunSidereal = siderealLongitude(Astronomy.Body.Sun, now);
+ document.getElementById("rows").innerHTML=data.map(p=>`<tr><td>${p.name}</td><td>${signs[p.sign]}</td><td>${degText(p.within)}</td><td>${getPlanetStatus(p,now,sunSidereal)}</td></tr>`).join("");
  document.getElementById("status").textContent=`दिल्ली का लग्न: ${signs[lagnaSign]} ${degText(lagnaDegree)} · `+(selectedDateTime?"चुना हुआ समय":"लाइव कुंडली")+" · अनुमानित Lahiri ayanamsha";
  }catch(e){console.error(e);document.getElementById("status").textContent="गणना में त्रुटि हुई। इंटरनेट और गणना लाइब्रेरी जाँचें।"}
 }
