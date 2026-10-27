@@ -203,4 +203,285 @@ document.getElementById("leftRotate").addEventListener("click",()=>{rotationOffs
 document.getElementById("rightRotate").addEventListener("click",()=>{rotationOffset=(rotationOffset+11)%12;calc()});
 document.getElementById("applyDateTime").addEventListener("click",()=>{const dateValue=document.getElementById("chartDate").value,timeValue=document.getElementById("chartTime").value;if(!dateValue||!timeValue){document.getElementById("status").textContent="कृपया तारीख और समय दोनों चुनें।";return}const chosen=new Date(`${dateValue}T${timeValue}:00+05:30`);if(Number.isNaN(chosen.getTime())){document.getElementById("status").textContent="तारीख या समय सही नहीं है।";return}selectedDateTime=chosen;calc()});
 document.getElementById("liveNow").addEventListener("click",()=>{selectedDateTime=null;setDateTimeInputs();calc()});
-function ayanamsha(date){const y=सूर्य
+function ayanamsha(date){const y=date.getUTCFullYear()+(date.getUTCMonth()+0.5)/12,t=(y-2000)/100;return 23.853055+1.3969713*t+0.0003086*t*t}
+function norm(x){return ((x%360)+360)%360}
+function degText(x){const d=Math.floor(x),m=Math.floor((x-d)*60),s=Math.floor((((x-d)*60)-m)*60);return `${d}° ${m}' ${s}"`}
+function siderealLongitude(body,date){const v=Astronomy.GeoVector(body,date,true);return norm(Astronomy.Ecliptic(v).elon-ayanamsha(date))}
+function calculateLagna(date){const jd=date.getTime()/86400000+2440587.5,T=(jd-2451545.0)/36525;const gmst=norm(280.46061837+360.98564736629*(jd-2451545.0)+0.000387933*T*T-T*T*T/38710000);const lst=norm(gmst+DELHI_LON),eps=23.439291-0.0130042*T-0.000000164*T*T+0.000000504*T*T*T;const theta=lst*Math.PI/180,e=eps*Math.PI/180,phi=DELHI_LAT*Math.PI/180;const tropical=norm(Math.atan2(Math.cos(theta),-(Math.sin(e)*Math.tan(phi)+Math.cos(e)*Math.sin(theta)))*180/Math.PI);return norm(tropical-ayanamsha(date))}
+function updateMoonAndAvakhada(moonSidereal,lagnaSign){
+ const moonSign=Math.floor(moonSidereal/30),moonDegree=moonSidereal%30,nakSize=360/27,padaSize=nakSize/4,nakIndex=Math.floor(moonSidereal/nakSize),withinNak=moonSidereal-(nakIndex*nakSize),pada=Math.min(4,Math.floor(withinNak/padaSize)+1),akshar=nakshatraSyllables[nakIndex][pada-1],traits=nakshatraTraits[nakIndex];
+ document.getElementById("moonRashi").textContent=signs[moonSign];document.getElementById("moonRashiLord").textContent=signLords[moonSign];document.getElementById("moonDegree").textContent=degText(moonDegree);
+ document.getElementById("birthNakshatra").textContent=nakshatras[nakIndex];document.getElementById("nakshatraLord").textContent=nakshatraLords[nakIndex];document.getElementById("nakshatraPada").textContent=`${pada} / 4`;document.getElementById("nakshatraAkshar").textContent=akshar;
+ document.getElementById("listNakshatraPada").textContent=` − चरण ${pada} − ${akshar}`;
+ const varnaBySign=["क्षत्रिय","वैश्य","शूद्र","ब्राह्मण","क्षत्रिय","वैश्य","शूद्र","ब्राह्मण","क्षत्रिय","वैश्य","शूद्र","ब्राह्मण"];
+ const vashyaBySign=["चतुष्पद","चतुष्पद","मानव","जलचर","वनचर","मानव","मानव","कीट","चतुष्पद","चतुष्पद","मानव","जलचर"];
+ document.getElementById("avVarna").textContent=varnaBySign[moonSign];document.getElementById("avVashya").textContent=vashyaBySign[moonSign];document.getElementById("avYoni").textContent=traits[0];document.getElementById("avGana").textContent=traits[1];document.getElementById("avNadi").textContent=traits[2];document.getElementById("avRashi").textContent=signs[moonSign];document.getElementById("avRashiLord").textContent=signLords[moonSign];document.getElementById("avNakshatra").textContent=nakshatras[nakIndex];document.getElementById("avNakshatraLord").textContent=nakshatraLords[nakIndex];document.getElementById("avPada").textContent=`${pada} / 4`;document.getElementById("avAkshar").textContent=akshar;
+ // पाया: चंद्र राशि लग्न से किस भाव में है, उसके अनुसार
+ const moonHouse=((moonSign-lagnaSign+12)%12)+1;
+ let paya;
+ if([1,6,11].includes(moonHouse))paya="सोना";
+ else if([2,5,9].includes(moonHouse))paya="चाँदी";
+ else if([3,7,10].includes(moonHouse))paya="ताँबा";
+ else paya="लोहा";
+ document.getElementById("avPaya").textContent=paya;
+}
+function updateSunMoonTimes(date){
+ const ids={sunriseTime:null,sunsetTime:null,moonriseTime:null,moonsetTime:null};
+ try{
+  const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(date);
+  const part=Object.fromEntries(parts.map(x=>[x.type,x.value]));
+  const midnight=new Date(Date.UTC(Number(part.year),Number(part.month)-1,Number(part.day))-330*60000);
+  const observer=new Astronomy.Observer(DELHI_LAT,DELHI_LON,0);
+  const fmt=event=>event?new Intl.DateTimeFormat("hi-IN",{timeZone:"Asia/Kolkata",hour:"2-digit",minute:"2-digit",hour12:true}).format(event.date):"इस दिन नहीं";
+  const sunRise=Astronomy.SearchRiseSet(Astronomy.Body.Sun,observer,+1,midnight,1);
+  const sunSet=Astronomy.SearchRiseSet(Astronomy.Body.Sun,observer,-1,midnight,1);
+  const moonRise=Astronomy.SearchRiseSet(Astronomy.Body.Moon,observer,+1,midnight,1);
+  const moonSet=Astronomy.SearchRiseSet(Astronomy.Body.Moon,observer,-1,midnight,1);
+  document.getElementById("sunriseTime").textContent=fmt(sunRise);
+  document.getElementById("sunsetTime").textContent=fmt(sunSet);
+  document.getElementById("moonriseTime").textContent=fmt(moonRise);
+  document.getElementById("moonsetTime").textContent=fmt(moonSet);
+ }catch(e){console.error("Sun/moon rise-set calculation failed",e);Object.keys(ids).forEach(id=>document.getElementById(id).textContent="—")}
+}
+
+function updateBirthAndPanchang(date,lagnaSign,lagnaDegree){
+ const dateOptions={timeZone:"Asia/Kolkata",day:"2-digit",month:"long",year:"numeric"},timeOptions={timeZone:"Asia/Kolkata",hour:"2-digit",minute:"2-digit",hour12:true};
+ document.getElementById("birthDate").textContent=new Intl.DateTimeFormat("hi-IN",dateOptions).format(date);document.getElementById("birthTime").textContent=new Intl.DateTimeFormat("hi-IN",timeOptions).format(date);document.getElementById("birthLagna").textContent=signs[lagnaSign]+" "+degText(lagnaDegree);document.getElementById("listLagna").textContent=signs[lagnaSign]+" "+degText(lagnaDegree);
+ const weekdayName=new Intl.DateTimeFormat("en-US",{timeZone:"Asia/Kolkata",weekday:"short"}).format(date),weekdayIndex={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6}[weekdayName]??0;document.getElementById("pWeekday").textContent=weekdays[weekdayIndex];
+ const sunTropical=Astronomy.Ecliptic(Astronomy.GeoVector(Astronomy.Body.Sun,date,true)).elon,moonTropical=Astronomy.Ecliptic(Astronomy.GeoVector(Astronomy.Body.Moon,date,true)).elon,ayan=ayanamsha(date),sunSidereal=norm(sunTropical-ayan),moonSidereal=norm(moonTropical-ayan),elongation=norm(moonTropical-sunTropical),tithiIndex=Math.min(29,Math.floor(elongation/12));
+ let tithiName;if(tithiIndex===14)tithiName="पूर्णिमा";else if(tithiIndex===29)tithiName="अमावस्या";else tithiName=tithis[tithiIndex%15];document.getElementById("pTithi").textContent=tithiName;document.getElementById("pPaksha").textContent=elongation<180?"शुक्ल पक्ष":"कृष्ण पक्ष";
+ const nakIndex=Math.floor(moonSidereal/(360/27))%27;document.getElementById("pNakshatra").textContent=nakshatras[nakIndex];const yogaIndex=Math.floor(norm(sunSidereal+moonSidereal)/(360/27))%27;document.getElementById("pYoga").textContent=yogas[yogaIndex];
+ const karanaIndex=Math.floor(elongation/6)%60;let karanaName;if(karanaIndex===0)karanaName="किंस्तुघ्न";else if(karanaIndex>=57)karanaName=["शकुनि","चतुष्पद","नाग"][karanaIndex-57];else karanaName=karanas[(karanaIndex-1)%7];document.getElementById("pKarana").textContent=karanaName;
+ updateMoonAndAvakhada(moonSidereal,lagnaSign);
+}
+function addSvgText(group,x,y,className,text,fill){const el=document.createElementNS("http://www.w3.org/2000/svg","text");el.setAttribute("x",x);el.setAttribute("y",y);el.setAttribute("class",className);if(fill)el.setAttribute("fill",fill);el.textContent=text;group.appendChild(el);return el}
+
+/* ग्रहों की वास्तविक दैनिक गति और सूर्य से कोणीय दूरी के आधार पर स्थिति */
+function getPlanetStatus(p, now, sunSidereal) {
+  // सूर्य की गति हमेशा मार्गी दिखाई जाती है; राहु-केतु हमेशा वक्री।
+  if (p.name === "सूर्य") return "मार्गी";
+  if (p.name === "राहु" || p.name === "केतु") return "वक्री";
+
+  const bodyName = planets.find(x => x[1] === p.name)?.[0];
+  if (!bodyName) return "—";
+
+  // 24 घंटे के अंतर से ग्रह की राशि-देशांतर गति जाँचें; 180° पार होने पर दिशा सही करें।
+  const body = Astronomy.Body[bodyName];
+  const tomorrow = new Date(now.getTime() + 86400000);
+  const lon1 = siderealLongitude(body, now);
+  const lon2 = siderealLongitude(body, tomorrow);
+  let speed = norm(lon2 - lon1);
+  if (speed > 180) speed -= 360;
+
+  const motion = (p.name === "चंद्र") ? "मार्गी" : (speed < 0 ? "वक्री" : "मार्गी");
+
+  // अस्त/दग्ध स्थिति सूर्य से न्यूनतम कोणीय दूरी (डिग्री) से जाँची जाती है।
+  // परंपरागत प्रचलित सीमाएँ; बुध/शुक्र के वक्री होने पर कुछ कम सीमा लागू होती है।
+  const separationRaw = norm(p.lon - sunSidereal);
+  const separation = separationRaw > 180 ? 360 - separationRaw : separationRaw;
+  let limit = null;
+  if (p.name === "चंद्र") limit = 12;
+  else if (p.name === "मंगल") limit = 17;
+  else if (p.name === "बुध") limit = speed < 0 ? 12 : 14;
+  else if (p.name === "गुरु") limit = 11;
+  else if (p.name === "शुक्र") limit = speed < 0 ? 8 : 10;
+  else if (p.name === "शनि") limit = 15;
+
+  // राहु-केतु पर अस्त लागू नहीं होता; अन्य ग्रहों के लिए सूर्य से कोणीय दूरी जाँची जाती है।
+  if (limit !== null && separation <= limit) return motion + " · अस्त";
+  return motion + " · उदय";
+}
+
+function setupKundliTabs(){
+ document.querySelectorAll(".kundli-tab").forEach(btn=>btn.addEventListener("click",()=>{
+  document.querySelectorAll(".kundli-tab").forEach(b=>b.classList.toggle("active",b===btn));
+  document.querySelectorAll(".tab-panel").forEach(panel=>panel.hidden=panel.id!==btn.dataset.panel);
+ }));
+}
+const dashaLords=["केतु","शुक्र","सूर्य","चंद्र","मंगल","राहु","गुरु","शनि","बुध"];
+const dashaYears={"केतु":7,"शुक्र":20,"सूर्य":6,"चंद्र":10,"मंगल":7,"राहु":18,"गुरु":16,"शनि":19,"बुध":17};
+const nakLordSequence=Array.from({length:27},(_,i)=>dashaLords[i%9]);
+function dashaAt(moonLon,date){
+ const span=360/27,nakIndex=Math.floor(moonLon/span),fraction=(moonLon%span)/span,firstLord=nakLordSequence[nakIndex],start=dashaLords.indexOf(firstLord);
+ const elapsed=fraction*dashaYears[firstLord],remaining=dashaYears[firstLord]-elapsed;
+ const startDate=new Date(date.getTime()-elapsed*365.2425*86400000);
+ let cursor=new Date(startDate),periods=[];
+ for(let i=0;i<18;i++){
+  const lord=dashaLords[(start+i)%9],years=dashaYears[lord],end=new Date(cursor.getTime()+years*365.2425*86400000);
+  periods.push({lord,start:new Date(cursor),end,years});cursor=end;
+ }
+ let maha=periods.find(x=>date>=x.start&&date<x.end)||periods[0];
+ if(!maha || (maha.lord===firstLord && date<maha.start)) maha={lord:firstLord,start:startDate,end:new Date(startDate.getTime()+dashaYears[firstLord]*365.2425*86400000)};
+ const mdIndex=dashaLords.indexOf(maha.lord),mdDuration=dashaYears[maha.lord],mdElapsed=Math.max(0,(date-maha.start)/(365.2425*86400000));
+ const adSequence=Array.from({length:9},(_,i)=>dashaLords[(mdIndex+i)%9]);let adCursor=new Date(maha.start),antar=null;
+ for(const lord of adSequence){const years=mdDuration*dashaYears[lord]/120, end=new Date(adCursor.getTime()+years*365.2425*86400000);if(date>=adCursor&&date<end){antar={lord,start:adCursor,end,years};break}adCursor=end;}
+ if(!antar) antar={lord:adSequence[0],start:maha.start,end:maha.end,years:mdDuration*dashaYears[adSequence[0]]/120};
+ const adIdx=dashaLords.indexOf(antar.lord),adDuration=antar.years,prSequence=Array.from({length:9},(_,i)=>dashaLords[(adIdx+i)%9]);let prCursor=new Date(antar.start),pratyantar=null;
+ for(const lord of prSequence){const years=adDuration*dashaYears[lord]/120,end=new Date(prCursor.getTime()+years*365.2425*86400000);if(date>=prCursor&&date<end){pratyantar={lord,start:prCursor,end};break}prCursor=end;}
+ if(!pratyantar)pratyantar={lord:prSequence[0],start:antar.start,end:antar.end};
+ return {maha,antar,pratyantar,firstLord,remaining};
+}
+function yoginiDashaAt(moonLon,date){
+ const names=["मंगला","पिंगला","धन्या","भ्रामरी","भद्रिका","उल्का","सिद्धा","संकटा"],years=[1,2,3,4,5,6,7,8],span=360/27,nakIndex=Math.floor(moonLon/span),fraction=(moonLon%span)/span,start=nakIndex%8;
+ const first=names[start],elapsed=fraction*years[start],birthStart=new Date(date.getTime()-elapsed*365.2425*86400000);let cursor=new Date(birthStart),periods=[];
+ for(let i=0;i<24;i++){const idx=(start+i)%8,end=new Date(cursor.getTime()+years[idx]*365.2425*86400000);periods.push({name:names[idx],start:new Date(cursor),end,years:years[idx]});cursor=end;}
+ const maha=periods.find(x=>date>=x.start&&date<x.end)||periods[0],mi=names.indexOf(maha.name);let subCursor=new Date(maha.start),antar=null;
+ for(let i=0;i<8;i++){const idx=(mi+i)%8,duration=maha.years*years[idx]/36,end=new Date(subCursor.getTime()+duration*365.2425*86400000);if(date>=subCursor&&date<end){antar={name:names[idx],start:new Date(subCursor),end};break;}subCursor=end;}
+ if(!antar)antar={name:names[mi],start:maha.start,end:maha.end};
+ return {maha,antar};
+}
+function fmtDateShort(d){return new Intl.DateTimeFormat("hi-IN",{timeZone:"Asia/Kolkata",day:"2-digit",month:"short",year:"numeric"}).format(d)}
+function setLine(label,value){return `<div class="detail-line"><span class="detail-label">${label}</span><span class="detail-value">${value}</span></div>`}
+function updateInsightPanels(data,lagnaSign,now){
+ const mars=data.find(p=>p.name==="मंगल"),sun=data.find(p=>p.name==="सूर्य"),rahu=data.find(p=>p.name==="राहु"),moon=data.find(p=>p.name==="चंद्र"),ketu=data.find(p=>p.name==="केतु");
+ const housesFrom=(p,sign)=>((p.sign-sign+12)%12)+1, marsLagnaHouse=housesFrom(mars,lagnaSign),moonSign=moon.sign,marsMoonHouse=housesFrom(mars,moonSign),manglikHouses=[1,2,4,7,8,12],scores=(manglikHouses.includes(marsLagnaHouse)?50:0)+(manglikHouses.includes(marsMoonHouse)?50:0);
+ const sunRahuGap=Math.min((sun.lon-rahu.lon+360)%360,(rahu.lon-sun.lon+360)%360),ninthSign=(lagnaSign+8)%12,rahuNinth=rahu.sign===ninthSign,ketuNinth=ketu.sign===ninthSign;
+ const pitra=(sunRahuGap<=10||rahuNinth||ketuNinth);
+ const nakIndex=Math.floor(moon.lon/(360/27)),moola=nakIndex===18;
+ document.getElementById("doshaContent").innerHTML=setLine("मंगल दोष",`${scores}% (लग्न से भाव ${marsLagnaHouse}, चंद्र से भाव ${marsMoonHouse})`)+setLine("पितृ दोष",pitra?"संकेत मिलते हैं — विस्तृत कुंडली-जाँच आवश्यक":"प्रमुख संकेत नहीं मिले")+setLine("मूल / मूल नक्षत्र",moola?"चंद्रमा मूल नक्षत्र में है":"चंद्रमा मूल नक्षत्र में नहीं है");
+ const ds=dashaAt(moon.lon,now);document.getElementById("dashaContent").innerHTML=setLine("महादशा",`${ds.maha.lord} (${fmtDateShort(ds.maha.start)} – ${fmtDateShort(ds.maha.end)})`)+setLine("अंतर दशा",`${ds.antar.lord} (${fmtDateShort(ds.antar.start)} – ${fmtDateShort(ds.antar.end)})`)+setLine("प्रत्यंतर दशा",`${ds.pratyantar.lord} (${fmtDateShort(ds.pratyantar.start)} – ${fmtDateShort(ds.pratyantar.end)})`);
+ const yd=yoginiDashaAt(moon.lon,now);document.getElementById("yoginiDashaContent").innerHTML=setLine("योगिनी महादशा",`${yd.maha.name} (${fmtDateShort(yd.maha.start)} – ${fmtDateShort(yd.maha.end)})`)+setLine("योगिनी अंतरदशा",`${yd.antar.name} (${fmtDateShort(yd.antar.start)} – ${fmtDateShort(yd.antar.end)})`);
+ const sign=signs[moon.sign],lagna=signs[lagnaSign];
+ const houseNames=["प्रथम भाव — तनु भाव","द्वितीय भाव — धन भाव","तृतीय भाव — पराक्रम भाव","चतुर्थ भाव — सुख भाव","पंचम भाव — विद्या एवं संतान भाव","षष्ठ भाव — ऋण, रोग एवं सेवा भाव","सप्तम भाव — विवाह एवं साझेदारी भाव","अष्टम भाव — आयु एवं परिवर्तन भाव","नवम भाव — भाग्य एवं धर्म भाव","दशम भाव — कर्म एवं प्रतिष्ठा भाव","एकादश भाव — लाभ एवं इच्छापूर्ति भाव","द्वादश भाव — व्यय एवं मोक्ष भाव"];
+ const houseTopics=[
+ "स्वभाव, व्यक्तित्व, आत्मविश्वास, शरीर और जीवन की दिशा। इस भाव में ग्रह होने पर उनकी प्रकृति व्यक्ति की पहल, निर्णय लेने की शैली और लोगों के सामने प्रस्तुत होने के तरीके से जोड़ी जाती है।",
+ "आय, बचत, परिवार, वाणी, भोजन की आदतें और संचित संसाधन। ग्रहों की स्थिति कमाई सँभालने, परिवार में संवाद और धन के प्रति दृष्टिकोण की पारंपरिक व्याख्या में देखी जाती है।",
+ "साहस, प्रयास, छोटे भाई-बहन, संचार, लेखन, कौशल और छोटी यात्राएँ। यहाँ के ग्रह पहल करने, अभ्यास, संवाद और अपने दम पर काम आगे बढ़ाने की शैली से जोड़े जाते हैं।",
+ "घर, माता, घरेलू वातावरण, संपत्ति, वाहन, शिक्षा की बुनियाद और मानसिक सुकून। ग्रह इस बात की पारंपरिक व्याख्या में देखे जाते हैं कि व्यक्ति स्थिरता और निजी आराम कैसे खोजता है।",
+ "बुद्धि, शिक्षा, रचनात्मकता, प्रेम, संतान और रुचियाँ। इस भाव के ग्रह सीखने, कल्पनाशीलता, अपनी प्रतिभा व्यक्त करने और सोच-समझकर निर्णय लेने की प्रवृत्ति से जोड़े जाते हैं।",
+ "दिनचर्या, सेवा, काम की चुनौतियाँ, प्रतिस्पर्धा, ऋण और स्वास्थ्य-संबंधी आदतें। ग्रह अनुशासन, समस्याएँ सुलझाने, सहयोग और रोज़मर्रा के दबाव सँभालने की शैली की व्याख्या में उपयोग किए जाते हैं।",
+ "विवाह, जीवनसाथी, व्यावसायिक साझेदारी, समझौते और सार्वजनिक व्यवहार। ग्रह संबंधों में अपेक्षाओं, सहयोग, बातचीत और साझे निर्णयों की पारंपरिक व्याख्या में देखे जाते हैं।",
+ "अचानक बदलाव, साझा धन, विरासत, गोपनीय विषय, शोध और गहरे मनोवैज्ञानिक परिवर्तन। यहाँ के ग्रह अनिश्चितता सँभालने, चीज़ों की तह तक जाने और बदलाव के प्रति प्रतिक्रिया से जोड़े जाते हैं।",
+ "भाग्य, उच्च शिक्षा, गुरु, सिद्धांत, धर्म-दर्शन, लंबी यात्राएँ और व्यापक दृष्टि। ग्रह सीखने, मार्गदर्शन, नैतिक मान्यताओं और जीवन के अर्थ को समझने की शैली की व्याख्या में देखे जाते हैं।",
+ "कर्म, पेशा, जिम्मेदारी, सामाजिक प्रतिष्ठा, नेतृत्व और सार्वजनिक योगदान। इस भाव के ग्रह काम करने के तरीके, लक्ष्य, अधिकार सँभालने और समाज में भूमिका से जुड़े पारंपरिक संकेत देते हैं।",
+ "लाभ, आय के अवसर, मित्र, समूह, नेटवर्क और दीर्घकालीन इच्छाएँ। ग्रह सहयोगी समूहों, संपर्कों, उपलब्धियों और योजनाओं को आगे बढ़ाने की शैली से जोड़े जाते हैं।",
+ "खर्च, विश्राम, एकांत, विदेश/दूरस्थ स्थान, त्याग, आध्यात्मिक चिंतन और अवचेतन। ग्रह निजी समय, खर्च सँभालने, पीछे रहकर काम करने और आत्मचिंतन की प्रवृत्ति से जुड़े संकेत देते हैं।"
+ ];
+ const planetEffects={
+ "सूर्य":"आत्मविश्वास, नेतृत्व, प्रतिष्ठा और पिता/अधिकार से जुड़े विषयों को उभारने का पारंपरिक संकेत। संतुलित अभिव्यक्ति के लिए अहं और सहयोग के बीच तालमेल उपयोगी है।",
+ "चंद्र":"मन, भावनात्मक प्रतिक्रिया, देखभाल, अनुकूलन और जनसंपर्क से जुड़े विषयों को प्रमुख कर सकता है। नियमित दिनचर्या और भावनाओं को स्पष्ट रूप से व्यक्त करना सहायक है।",
+ "मंगल":"साहस, प्रतिस्पर्धा, ऊर्जा, पहल और विवाद सँभालने के ढंग से जुड़ा माना जाता है। ऊर्जा को योजनाबद्ध कार्य में लगाना और जल्दबाज़ी से बचना उपयोगी है।",
+ "बुध":"बुद्धि, बातचीत, लेखन, गणना, व्यापार और सीखने की शैली से जुड़ा है। स्पष्ट संवाद और तथ्यों की जाँच इसके विषयों को बेहतर ढंग से दिशा दे सकती है।",
+ "गुरु":"ज्ञान, सलाह, विस्तार, शिक्षा, नैतिकता और संरक्षण से जुड़े विषयों का संकेत माना जाता है। आशावाद के साथ व्यावहारिक योजना रखना उपयोगी है।",
+ "शुक्र":"संबंध, सामंजस्य, कला, सौंदर्य, सुविधा और पसंद-नापसंद से जुड़े विषयों को दर्शाता है। संतुलित अपेक्षाएँ और संसाधनों का विवेकपूर्ण उपयोग महत्वपूर्ण है।",
+ "शनि":"अनुशासन, धैर्य, सीमाएँ, मेहनत और दीर्घकालीन जिम्मेदारियों से जुड़ा है। धीमी लेकिन नियमित प्रगति और जिम्मेदारियों का व्यवस्थित बँटवारा मददगार हो सकता है।",
+ "राहु":"महत्त्वाकांक्षा, असामान्य अनुभव, तकनीक/नए रास्ते और तीव्र इच्छा से जुड़ा माना जाता है। तथ्यों की जाँच और अतिशयोक्ति से बचना उपयोगी है।",
+ "केतु":"अंतर्मुखता, विश्लेषण, अलग दृष्टिकोण, विरक्ति और किसी विषय की गहराई में जाने से जुड़ा है। व्यावहारिक जिम्मेदारियों और आत्मचिंतन के बीच संतुलन रखें।"
+ };
+ const signStyles=["मेष की पहल और साहस","वृषभ की स्थिरता और व्यावहारिकता","मिथुन की जिज्ञासा और संवादशीलता","कर्क की संवेदनशीलता और सुरक्षा-भावना","सिंह का आत्मविश्वास और अभिव्यक्ति","कन्या का विश्लेषण और व्यवस्था","तुला का संतुलन और सहयोग","वृश्चिक की गहराई और परिवर्तनशीलता","धनु का आशावाद और सीखने की प्रवृत्ति","मकर का अनुशासन और लक्ष्य-केंद्रितता","कुंभ की स्वतंत्र सोच और नवीनता","मीन की कल्पनाशीलता और संवेदनशीलता"];
+ const houseReports=Array.from({length:12},(_,i)=>{
+   const signIndex=(lagnaSign+i)%12, occupants=data.filter(p=>((p.sign-lagnaSign+12)%12)===i);
+   const planetText=occupants.length?occupants.map(p=>`<p><strong>${p.name} — ${signs[p.sign]} राशि:</strong> ${planetEffects[p.name]||"इस ग्रह के विषय"} राशि-स्वभाव ${signStyles[p.sign]} के माध्यम से व्यक्त होने की पारंपरिक व्याख्या की जाती है। राशि स्वामी ${signLords[p.sign]} है।</p>`).join(""):`<p><strong>इस भाव में ग्रह:</strong> इस समय की ग्रह-सूची में कोई ग्रह इस भाव में नहीं दिख रहा। इसका अर्थ यह नहीं कि भाव निष्क्रिय है; पारंपरिक विश्लेषण में भाव की राशि, उसके स्वामी की स्थिति और दृष्टियों को भी देखा जाता है।`;
+   const lord=signLords[signIndex],lordPlanet=data.find(p=>p.name===lord),lordHouse=lordPlanet?((lordPlanet.sign-lagnaSign+12)%12)+1:null;
+   const lordText=lordPlanet?`इस भाव की राशि ${signs[signIndex]} है और स्वामी ${lord} ${signs[lordPlanet.sign]} राशि के ${lordHouse}वें भाव में स्थित है। इसलिए इस भाव के विषयों का संबंध ${houseNames[lordHouse-1].toLowerCase()} से भी जोड़ा जा सकता है।`:`इस भाव की राशि ${signs[signIndex]} है और उसका स्वामी ${lord} है; स्वामी की उपलब्ध स्थिति के आधार पर आगे का विश्लेषण किया जाता है।`;
+   return `<section class="details-section"><h3>${houseNames[i]}</h3><p><strong>मुख्य विषय:</strong> ${houseTopics[i]}</p><p><strong>भाव की राशि:</strong> ${signs[signIndex]} — ${signStyles[signIndex]}। ${lordText}</p>${planetText}</section>`;
+ });
+ const planetReports=["सूर्य","चंद्र","मंगल","बुध","गुरु","शुक्र","शनि","राहु","केतु"].map(name=>{
+   const p=data.find(x=>x.name===name);
+   if(!p) return `<section class="details-section"><h3>${name} ग्रह का फलादेश</h3><p>इस ग्रह की स्थिति उपलब्ध गणना में नहीं मिली।</p></section>`;
+   const house=((p.sign-lagnaSign+12)%12)+1, lord=signLords[p.sign], lordPlanet=data.find(x=>x.name===lord);
+   const position=`${name} ${signs[p.sign]} राशि के ${house}वें भाव में स्थित है। इस राशि का स्वामी ${lord} है।`;
+   const dignity=`राशि का स्वभाव ${signStyles[p.sign]} है; इसलिए ग्रह के सामान्य संकेत इस स्वभाव के माध्यम से व्यक्त होने की पारंपरिक व्याख्या की जाती है।`;
+   const houseText=houseTopics[house-1];
+   const lordText=lordPlanet?`राशि स्वामी ${lord} ${signs[lordPlanet.sign]} राशि के ${((lordPlanet.sign-lagnaSign+12)%12)+1}वें भाव में है; इससे ग्रह के फल की व्याख्या में उस भाव के विषय भी देखे जाते हैं।`:`राशि स्वामी ${lord} की स्थिति भी विस्तृत विश्लेषण में देखी जाती है।`;
+   return `<section class="details-section"><h3>${name} ग्रह का अलग-अलग फलादेश</h3><p><strong>स्थिति:</strong> ${position}</p><p><strong>ग्रह का सामान्य प्रभाव:</strong> ${planetEffects[name]||"इस ग्रह के पारंपरिक संकेत"}</p><p><strong>राशि के अनुसार प्रभाव:</strong> ${dignity}</p><p><strong>भाव के अनुसार फल:</strong> ${houseText}</p><p><strong>राशि स्वामी:</strong> ${lordText}</p></section>`;
+ });
+ const signReports=Array.from({length:12},(_,i)=>{
+   const occupants=data.filter(p=>p.sign===i);
+   const lord=signLords[i],lordPlanet=data.find(p=>p.name===lord),lordHouse=lordPlanet?((lordPlanet.sign-lagnaSign+12)%12)+1:null;
+   const planetText=occupants.length?occupants.map(p=>`<p><strong>${p.name} — ${signs[i]} राशि में:</strong> ${planetEffects[p.name]||"इस ग्रह के विषय"} इस राशि के स्वभाव (${signStyles[i]}) के कारण इन संकेतों की अभिव्यक्ति में उस राशि की प्रकृति भी जुड़ती है। व्यावहारिक फल समझने के लिए ग्रह का भाव-स्थान और राशि स्वामी की स्थिति भी साथ देखी जाती है।</p>`).join(""):`<p>इस राशि में वर्तमान ग्रह-सूची के अनुसार कोई ग्रह स्थित नहीं है। इसलिए यहाँ किसी ग्रह का प्रत्यक्ष राशि-फल नहीं दिया जा रहा; राशि स्वामी की स्थिति और कुंडली में संबंधित भाव को साथ देखकर अर्थ निकाला जाता है।`;
+   const lordText=lordPlanet?`राशि स्वामी ${lord} ${signs[lordPlanet.sign]} राशि के ${lordHouse}वें भाव में स्थित है। इससे इस राशि के विषयों का संबंध ${houseNames[lordHouse-1].toLowerCase()} से भी जोड़ा जाता है।`:`इस राशि का स्वामी ${lord} है; उपलब्ध ग्रह-स्थिति के आधार पर उसका फल देखा जाता है।`;
+   return `<section class="details-section"><h3>${signs[i]} राशि में ग्रहों का प्रभाव एवं फल</h3><p><strong>राशि का स्वभाव:</strong> ${signStyles[i]}। ${lordText}</p>${planetText}</section>`;
+ });
+ const advice=[`<p><strong>कुंडली का आधार:</strong> लग्न <strong>${lagna}</strong> और चंद्र राशि <strong>${sign}</strong> है। फलादेश क्रमशः पहले 12 भावों का अलग-अलग, फिर 9 ग्रहों का अलग-अलग, और अंत में 12 राशियों में ग्रहों के प्रभाव का विवरण देता है।</p>`,`<h3>कुंडली के 12 भावों का विस्तृत फलादेश</h3>`,...houseReports,`<h3>9 ग्रहों का अलग-अलग फलादेश</h3>`,...planetReports,`<h3>12 राशियों में ग्रहों का प्रभाव और फल</h3>`,...signReports,`<p class="panel-note">यह पारंपरिक वैदिक-ज्योतिष पर आधारित सामान्य व्याख्या है, निश्चित भविष्यवाणी नहीं। खाली भाव या राशि को निष्फल नहीं माना जाता; भावेश, ग्रहों की स्थिति, दृष्टि और ग्रहबल जैसे कारक भी संपूर्ण कुंडली में देखे जाते हैं।</p>`];
+ document.getElementById("predictionContent").innerHTML=advice.join("");
+}
+function calc(){
+ if(!window.Astronomy){document.getElementById("status").textContent="गणना लाइब्रेरी लोड नहीं हुई। इंटरनेट जाँचकर पेज Refresh करें।";return}
+ try{
+ const now=selectedDateTime||new Date();document.getElementById("time").textContent="कुंडली समय (दिल्ली): "+new Intl.DateTimeFormat("en-IN",{timeZone:"Asia/Kolkata",dateStyle:"medium",timeStyle:"medium"}).format(now);
+ const data=planets.map(([body,name,color])=>{const lon=siderealLongitude(Astronomy.Body[body],now);return {name,color,lon,sign:Math.floor(lon/30),within:lon%30}});
+ const jd=now.getTime()/86400000+2440587.5,T=(jd-2451545)/36525,rahu=norm(125.04452-1934.136261*T+0.0020708*T*T+T*T*T/450000),rahuLon=norm(rahu-ayanamsha(now));
+ data.push({name:"राहु",color:"#348c79",lon:rahuLon,sign:Math.floor(rahuLon/30),within:rahuLon%30});const ketuLon=norm(rahuLon+180);data.push({name:"केतु",color:"#a05bc4",lon:ketuLon,sign:Math.floor(ketuLon/30),within:ketuLon%30});
+ const lagnaLon=calculateLagna(now),lagnaSign=Math.floor(lagnaLon/30),lagnaDegree=lagnaLon%30;updateSunMoonTimes(now);updateBirthAndPanchang(now,lagnaSign,lagnaDegree);updateInsightPanels(data,lagnaSign,now);
+ const byHouse=Array.from({length:12},()=>[]);data.forEach(p=>{const house=(p.sign-lagnaSign+12)%12;byHouse[house].push(p)});
+ const g=document.getElementById("labels");g.innerHTML="";
+ for(let house=0;house<12;house++){
+  const target=(house+rotationOffset+12)%12,[x,y]=positions[target],dx=x-200,dy=y-200,distance=Math.sqrt(dx*dx+dy*dy),move=24,xNew=x+(dx/distance)*move,yNew=y+(dy/distance)*move,signNumber=((lagnaSign+house)%12)+1;
+  const inwardMove=house===6?60:0,signX=xNew-(dx/distance)*inwardMove,signY=yNew-(dy/distance)*inwardMove;
+  addSvgText(g,signX,signY,"house",String(signNumber));
+  if(house===0)addSvgText(g,signX,signY+12,"lagna-label","लग्न");
+  /* ग्रह: हर पंक्ति में 2, अगली पंक्ति नीचे; मौजूदा 14px फ़ॉन्ट और SVG लेआउट जस का तस */
+  const planetBaseY = signY + (house===0 ? 26 : 16);
+  const planetStepX = 13;
+  const planetStepY = 16;
+  /* ग्रहों को भाव की सीमा से थोड़ा अंदर, केंद्र की ओर खिसकाएँ */
+  const labelDistance = Math.hypot(signX-200, signY-200) || 1;
+  const inwardX = ((200-signX)/labelDistance)*8;
+  const inwardY = ((200-signY)/labelDistance)*8;
+  byHouse[house].forEach((p,j)=>{
+    const row = Math.floor(j/2);
+    const col = j%2;
+    const planetX = signX + inwardX + (col===0 ? -planetStepX : planetStepX);
+    const planetY = planetBaseY + inwardY + row*planetStepY;
+    addSvgText(g,planetX,planetY,"planet",p.name,p.color);
+  });
+ }
+ const sunSidereal = siderealLongitude(Astronomy.Body.Sun, now);
+ document.getElementById("rows").innerHTML=data.map(p=>`<tr><td>${p.name}</td><td>${signs[p.sign]}</td><td>${degText(p.within)}</td><td>${getPlanetStatus(p,now,sunSidereal)}</td></tr>`).join("");
+ document.getElementById("status").textContent=`दिल्ली का लग्न: ${signs[lagnaSign]} ${degText(lagnaDegree)} · `+(selectedDateTime?"चुना हुआ समय":"लाइव कुंडली")+" · अनुमानित Lahiri ayanamsha";
+ }catch(e){console.error(e);document.getElementById("status").textContent="गणना में त्रुटि हुई। इंटरनेट और गणना लाइब्रेरी जाँचें।"}
+}
+
+function setupAshtakoot(){
+ const nakNames=["अश्विनी","भरणी","कृत्तिका","रोहिणी","मृगशीर्ष","आर्द्रा","पुनर्वसु","पुष्य","आश्लेषा","मघा","पूर्वा फाल्गुनी","उत्तरा फाल्गुनी","हस्त","चित्रा","स्वाती","विशाखा","अनुराधा","ज्येष्ठा","मूल","पूर्वाषाढ़ा","उत्तराषाढ़ा","श्रवण","धनिष्ठा","शतभिषा","पूर्वा भाद्रपद","उत्तरा भाद्रपद","रेवती"];
+ const gana=[0,1,2,0,0,1,0,0,1,1,1,0,0,1,0,0,0,1,1,1,0,0,1,0,1,0,0]; // देव=0, मनुष्य=1, राक्षस=2
+ const yoni=[0,1,2,3,4,5,6,7,8,9,10,11,4,5,6,7,8,9,10,11,2,3,0,1,5,7,6];
+ const nadi=[0,1,2,0,1,2,0,1,2,0,1,2,0,1,2,0,1,2,0,1,2,0,1,2,0,1,2];
+ const varnaBySign=[3,2,1,0,3,2,1,0,3,2,1,0]; // ब्राह्मण=0, क्षत्रिय=1, वैश्य=2, शूद्र=3 (पारंपरिक सरलीकरण)
+ const vashyaBySign=[0,1,2,3,0,1,2,3,0,1,2,3];
+ const signLordIdx=[2,4,3,1,0,3,4,2,5,6,6,5]; // सूर्य चंद्र मंगल बुध गुरु शुक्र शनि के अनुरूप नहीं, नीचे नाम से उपयोग
+ const lordBySign=["मंगल","शुक्र","बुध","चंद्र","सूर्य","बुध","शुक्र","मंगल","गुरु","शनि","शनि","गुरु"];
+ const friend={"सूर्य":{"सूर्य":5,"चंद्र":5,"मंगल":5,"बुध":4,"गुरु":5,"शुक्र":0,"शनि":0},"चंद्र":{"सूर्य":5,"चंद्र":5,"मंगल":4,"बुध":3,"गुरु":4,"शुक्र":3,"शनि":3},"मंगल":{"सूर्य":5,"चंद्र":4,"मंगल":5,"बुध":1,"गुरु":4,"शुक्र":2,"शनि":3},"बुध":{"सूर्य":4,"चंद्र":1,"मंगल":3,"बुध":5,"गुरु":2,"शुक्र":4,"शनि":3},"गुरु":{"सूर्य":5,"चंद्र":4,"मंगल":4,"बुध":2,"गुरु":5,"शुक्र":1,"शनि":3},"शुक्र":{"सूर्य":0,"चंद्र":2,"मंगल":3,"बुध":4,"गुरु":2,"शुक्र":5,"शनि":4},"शनि":{"सूर्य":0,"चंद्र":2,"मंगल":2,"बुध":4,"गुरु":3,"शुक्र":4,"शनि":5}};
+ function details(date,time){const d=new Date(date+"T"+(time||"12:00")+":00");if(Number.isNaN(d.getTime()))throw Error("जन्म तारीख और समय सही भरें।");const lon=siderealLongitude(Astronomy.Body.Moon,d),si=Math.floor(lon/30),ni=Math.floor(lon/(360/27));return {date:d,lon,sign:si,nak:ni};}
+ function tara(a,b){const n=((b-a+27)%27)+1;return [1,3,5,7].includes(n%9)?3:0;}
+ function score(a,b){
+  const varna=(varnaBySign[a.sign]>=varnaBySign[b.sign])?1:0;
+  const vashya=a.sign%4===b.sign%4?2:1;
+  const taraScore=(tara(a.nak,b.nak)+tara(b.nak,a.nak))/2;
+  const yoniScore=yoni[a.nak]===yoni[b.nak]?4:(Math.abs(yoni[a.nak]-yoni[b.nak])===1?3:Math.abs(yoni[a.nak]-yoni[b.nak])===2?2:1);
+  const l1=lordBySign[a.sign],l2=lordBySign[b.sign],graha=(friend[l1]&&friend[l1][l2]!==undefined)?friend[l1][l2]:3;
+  const g1=gana[a.nak],g2=gana[b.nak],ganaScore=g1===g2?6:((g1===0&&g2===1)||(g1===1&&g2===0))?5:((g1===1&&g2===2)||(g1===2&&g2===1))?1:0;
+  const dist=(b.sign-a.sign+12)%12+1,rev=(a.sign-b.sign+12)%12+1;const bhakoot=([2,5,6,8,9,12].includes(dist)||[2,5,6,8,9,12].includes(rev))?0:7;
+  const nadiScore=nadi[a.nak]===nadi[b.nak]?0:8;
+  const varnaNames=["ब्राह्मण","क्षत्रिय","वैश्य","शूद्र"];
+  const vashyaNames=["चतुष्पद","मानव","जलचर","वनचर"];
+  const ganaNames=["देव","मनुष्य","राक्षस"];
+  const yoniNames=["अश्व","गज","मेष","सर्प","श्वान","मार्जार","मूषक","गौ","महिष","व्याघ्र","मृग","वानर"];
+  const nadiNames=["आदि","मध्य","अंत्य"];
+  const rows=[
+   ["वर्ण",varnaNames[varnaBySign[a.sign]],varnaNames[varnaBySign[b.sign]],varna,1],
+   ["वश्य",vashyaNames[vashyaBySign[a.sign]],vashyaNames[vashyaBySign[b.sign]],vashya,2],
+   ["तारा",nakNames[a.nak],nakNames[b.nak],taraScore,3],
+   ["योनि",yoniNames[yoni[a.nak]%yoniNames.length],yoniNames[yoni[b.nak]%yoniNames.length],yoniScore,4],
+   ["ग्रह मैत्री",lordBySign[a.sign],lordBySign[b.sign],graha,5],
+   ["गण",ganaNames[gana[a.nak]],ganaNames[gana[b.nak]],ganaScore,6],
+   ["भकूट",signs[a.sign],signs[b.sign],bhakoot,7],
+   ["नाड़ी",nadiNames[nadi[a.nak]],nadiNames[nadi[b.nak]],nadiScore,8]
+  ];
+  return {rows,total:rows.reduce((s,r)=>s+r[3],0)};
+ }
+ document.getElementById("calculateAshtakoot").addEventListener("click",()=>{
+  const d1=document.getElementById("matchDate1").value,d2=document.getElementById("matchDate2").value,t1=document.getElementById("matchTime1").value,t2=document.getElementById("matchTime2").value,out=document.getElementById("ashtakootResult");
+  if(!d1||!d2){out.innerHTML="<p>कृपया दोनों व्यक्तियों की जन्म तारीख भरें।</p>";return;}
+  try{const a=details(d1,t1),b=details(d2,t2),res=score(a,b),pct=(res.total/36*100).toFixed(1);const label=res.total>=27?"उच्च गुण मिलान":res.total>=18?"मध्यम गुण मिलान":"कम गुण मिलान";
+   out.innerHTML=`<section class="details-section"><h3>कुल मिलान: ${res.total.toFixed(1)} / 36 गुण (${pct}%)</h3><p><strong>${label}</strong></p><p>वर: ${signs[a.sign]} राशि · ${nakNames[a.nak]} नक्षत्र</p><p>वधू: ${signs[b.sign]} राशि · ${nakNames[b.nak]} नक्षत्र</p><table><thead><tr><th>वर का अष्टकूट</th><th>वधू का अष्टकूट</th><th>मिलान के अंक</th></tr></thead><tbody>${res.rows.map(r=>`<tr><td><strong>${r[0]}</strong><br>${r[1]}</td><td><strong>${r[0]}</strong><br>${r[2]}</td><td>${Number(r[3]).toFixed(1)} / ${r[4]}</td></tr>`).join("")}</tbody></table></section>`;
+  }catch(e){out.innerHTML=`<p>${e.message||"गणना नहीं हो सकी।"}</p>`;}
+ });
+}
+
+setupKundliTabs();setupAshtakoot();calc();setInterval(calc,60000);setInterval(updateLiveClock,1000);
+</script>
+</body>
+</html>
+
